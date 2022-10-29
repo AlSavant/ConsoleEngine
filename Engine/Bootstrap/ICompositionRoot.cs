@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ConsoleEngine.Bootstrap
+﻿namespace ConsoleEngine.Bootstrap
 {
     internal interface ICompositionRoot
     {
+        void Run(CancellationTokenSource cancellationTokenSource);
+        void Update();
+        void LateUpdate();
+        void Stop();        
     }
 }

@@ -1,12 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ConsoleEngine.Bootstrap.Implementations
+﻿namespace ConsoleEngine.Bootstrap.Implementations
 {
-    internal class CompositionRoot
+    internal class CompositionRoot : ICompositionRoot
     {
+        private CancellationTokenSource? cancellationTokenSource;        
+
+        public void Run(CancellationTokenSource cancellationTokenSource)
+        {
+            this.cancellationTokenSource = cancellationTokenSource;
+        }
+       
+        public void Update()
+        {
+            
+        }
+
+        public void LateUpdate()
+        {
+
+        }
+
+        public void Stop()
+        {
+            cancellationTokenSource?.Cancel();
+        }
     }
 }
