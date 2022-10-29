@@ -2,7 +2,7 @@
 {
     public interface ISystem
     {
-        bool IsRunning { get; set; }
+        bool IsRunning { get; }
         bool IsAutoRun();
         void Run();
         void Update();
