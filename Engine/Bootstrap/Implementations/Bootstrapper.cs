@@ -15,8 +15,7 @@ namespace ConsoleEngine.Bootstrap.Implementations
                 .LifestyleSingleton()
                 .PropertiesIgnore((model, propertyInfo) => true));
 
-            var provider =
-                new ServiceCollection()
+            var provider = serviceCollection
                 .AddServices()
                 .BuildProvider();
 

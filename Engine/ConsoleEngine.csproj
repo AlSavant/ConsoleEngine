@@ -8,11 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="DependencyInjection\" />
+    <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
+    <ProjectReference Include="..\ConsoleEngine.DependencyInjection.Windsor\ConsoleEngine.DependencyInjection.Windsor.csproj" />
   </ItemGroup>
 
 </Project>
