@@ -1,4 +1,6 @@
-﻿namespace ConsoleEngine.Services.Implementations
+﻿using ConsoleEngine.Services.Util.Time;
+
+namespace ConsoleEngine.Services.Util.Time.Implementations
 {
     internal sealed class TimeReferenceService : ITimeReferenceService
     {

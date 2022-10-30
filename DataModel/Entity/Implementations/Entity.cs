@@ -57,7 +57,7 @@ namespace DataModel.Entity.Implementations
                 if (isNull != value)
                 {
                     isNull = value;
-                    this.Broadcast(new PropertyChangedEventArgs("IsNull"));
+                    this.Broadcast("IsNull");
                 }
             }
         }

@@ -1,4 +1,4 @@
-﻿namespace ConsoleEngine.Services
+﻿namespace ConsoleEngine.Services.Util.Time
 {
     public interface ITimeReferenceService : IService
     {

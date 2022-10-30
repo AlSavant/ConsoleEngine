@@ -1,4 +1,4 @@
-﻿using ConsoleEngine.Services;
+﻿using ConsoleEngine.Services.Util.Time;
 using System.Diagnostics;
 
 namespace ConsoleEngine.Systems.Implementations

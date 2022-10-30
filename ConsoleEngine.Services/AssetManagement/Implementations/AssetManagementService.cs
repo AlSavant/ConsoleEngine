@@ -3,6 +3,7 @@ using ConsoleEngine.Services.Factories;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml.Serialization;
 
 namespace ConsoleEngine.Services.AssetManagement.Implementations
 {
@@ -26,6 +27,54 @@ namespace ConsoleEngine.Services.AssetManagement.Implementations
 
             pool = new Dictionary<string, object>();
             serializers = serializationStrategyFactory.CreateInstances();
+        }
+
+        public T[] LoadAll<T>(string path)
+        {
+            var list = new List<T>();
+            var fullPath = Path.Combine(root, path);
+            if (!Directory.Exists(fullPath))
+            {
+                return null;
+            }
+            var files = Directory.GetFiles(fullPath, "*.xml", SearchOption.AllDirectories);
+            foreach (var file in files)
+            {
+                var formattedPath = file.Replace("\\", "/");
+                var index = formattedPath.IndexOf(root) + root.Length;
+                formattedPath = formattedPath.Substring(index);
+                if (formattedPath.EndsWith(".xml"))
+                {
+                    formattedPath = formattedPath.Substring(0, formattedPath.Length - 4);
+                }                
+                var resource = GetResource<T>(file);
+                if (resource == null)
+                {
+                    continue;
+                }
+                list.Add(resource);
+                if (!pool.ContainsKey(formattedPath))
+                {
+                    pool.Add(formattedPath, resource);                    
+                }                
+            }
+            return list.ToArray();
+        }
+
+        private T GetResource<T>(string fullPath)
+        {            
+            try
+            {
+                var serializer = new XmlSerializer(typeof(T));
+                using (Stream reader = new FileStream(fullPath, FileMode.Open))
+                {
+                    return (T)serializer.Deserialize(reader);                    
+                }               
+            }
+            catch
+            {
+                return default;
+            }            
         }
 
         public T Load<T>(string path)
