@@ -1,8 +1,8 @@
 ﻿using Castle.MicroKernel.Registration;
 using DependencyInjection;
 using DependencyInjection.Windsor;
-using EntityComponent.Entity;
-using EntityComponent.Entity.Implementations;
+using DataModel.Entity;
+using DataModel.Entity.Implementations;
 
 namespace ConsoleEngine.DependencyInjection.Windsor.Installers
 {

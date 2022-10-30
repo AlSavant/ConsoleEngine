@@ -8,7 +8,6 @@
     <ProjectReference Include="..\ConsoleEngine.Services\ConsoleEngine.Services.csproj" />
     <ProjectReference Include="..\ConsoleEngine.Systems\ConsoleEngine.Systems.csproj" />
     <ProjectReference Include="..\DependencyInjection.Windsor\DependencyInjection.Windsor.csproj" />
-    <ProjectReference Include="..\ECS\EntityComponent.csproj" />
   </ItemGroup>
 
 </Project>

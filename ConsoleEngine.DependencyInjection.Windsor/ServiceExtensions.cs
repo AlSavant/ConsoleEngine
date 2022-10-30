@@ -4,7 +4,7 @@ using ConsoleEngine.Systems;
 using DataModel.Reflection;
 using DependencyInjection;
 using DependencyInjection.Windsor;
-using EntityComponent.Components;
+using DataModel.Components;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

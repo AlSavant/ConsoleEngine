@@ -3,21 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityComponent", "ECS\EntityComponent.csproj", "{87705BEB-7C19-460E-9846-EABA4C64BA51}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataModel", "DataModel\DataModel.csproj", "{CD0FBE44-14DC-4268-83E1-C49DE2CBCF40}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleEngine", "Engine\ConsoleEngine.csproj", "{4AE0B212-F237-4EF2-9331-D655FE942F3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleEngine", "ConsoleEngine\ConsoleEngine.csproj", "{4AE0B212-F237-4EF2-9331-D655FE942F3B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DependencyInjection", "DependencyInjection\DependencyInjection.csproj", "{BCBB400F-C19C-4986-96B7-1C7DA14D6B00}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DependencyInjection.Windsor", "DependencyInjection.Windsor\DependencyInjection.Windsor.csproj", "{AACED196-7E26-45D2-8ECE-9A2BABDCD6B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleEngine.DependencyInjection.Windsor", "ConsoleEngine.DependencyInjection.Windsor\ConsoleEngine.DependencyInjection.Windsor.csproj", "{3E8AF7C8-4B12-4178-9A41-E2EF49245C33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleEngine.DependencyInjection.Windsor", "ConsoleEngine.DependencyInjection.Windsor\ConsoleEngine.DependencyInjection.Windsor.csproj", "{3E8AF7C8-4B12-4178-9A41-E2EF49245C33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleEngine.Systems", "ConsoleEngine.Systems\ConsoleEngine.Systems.csproj", "{73B69DE5-72E8-4229-91A3-7B8B500013AA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleEngine.Systems", "ConsoleEngine.Systems\ConsoleEngine.Systems.csproj", "{73B69DE5-72E8-4229-91A3-7B8B500013AA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleEngine.Services", "ConsoleEngine.Services\ConsoleEngine.Services.csproj", "{23407F78-7E3D-4506-831B-8793A8C7B480}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleEngine.Services", "ConsoleEngine.Services\ConsoleEngine.Services.csproj", "{23407F78-7E3D-4506-831B-8793A8C7B480}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +23,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{87705BEB-7C19-460E-9846-EABA4C64BA51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{87705BEB-7C19-460E-9846-EABA4C64BA51}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{87705BEB-7C19-460E-9846-EABA4C64BA51}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{87705BEB-7C19-460E-9846-EABA4C64BA51}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CD0FBE44-14DC-4268-83E1-C49DE2CBCF40}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CD0FBE44-14DC-4268-83E1-C49DE2CBCF40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD0FBE44-14DC-4268-83E1-C49DE2CBCF40}.Release|Any CPU.ActiveCfg = Release|Any CPU

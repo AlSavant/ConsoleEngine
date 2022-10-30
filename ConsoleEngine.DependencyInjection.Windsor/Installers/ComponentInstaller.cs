@@ -1,6 +1,6 @@
 ﻿using DependencyInjection;
 using DependencyInjection.Windsor;
-using EntityComponent.Components;
+using DataModel.Components;
 
 namespace ConsoleEngine.DependencyInjection.Windsor.Installers
 {
