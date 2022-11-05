@@ -1,4 +1,5 @@
-﻿using ConsoleEngine.Services.Factories;
+﻿using ConsoleEngine.Services.AssetManagement;
+using ConsoleEngine.Services.Factories;
 using ConsoleEngine.Services.Repositories.Entity;
 using ConsoleEngine.Services.Util.Rendering;
 using ConsoleEngine.Services.Util.Scenes;
@@ -47,6 +48,7 @@ namespace ConsoleEngine.Systems.Implementations
         private Vector2Int screenSize;
 
         public RenderingSystem(
+            IAssetManagementService assetManagementService,
             ISceneManagementService sceneManagementService,
             ICameraRepositoryService cameraRepositoryService,
             IRendererRepositoryService rendererRepositoryService,
@@ -56,6 +58,8 @@ namespace ConsoleEngine.Systems.Implementations
             this.guiRenderingService = guiRenderingService;
             this.cameraRepositoryService = cameraRepositoryService;
             this.rendererRepositoryService = rendererRepositoryService;
+            var skybox = assetManagementService.Load<SkyboxMaterial>("Materials/Skyboxes/Skybox");
+            var count = skybox.layers.Length;
             handle = CreateFile("CONOUT$", 0x40000000, 2, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero);
             UpdateCharBuffer();
         }        

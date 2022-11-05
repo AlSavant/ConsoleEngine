@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Materials\Skyboxes\Skybox.sky" />
     <None Remove="Resources\StaticData\Entity\System\camera.xml" />
   </ItemGroup>
 
@@ -26,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Resources\Materials\" />
     <Folder Include="Resources\Scenes\" />
     <Folder Include="Resources\Terrains\" />
     <Folder Include="Resources\Textures\" />
