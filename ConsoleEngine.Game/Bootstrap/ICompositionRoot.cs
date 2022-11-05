@@ -1,4 +1,4 @@
-﻿namespace ConsoleEngine.Bootstrap
+﻿namespace ConsoleEngine.Game.Bootstrap
 {
     internal interface ICompositionRoot
     {

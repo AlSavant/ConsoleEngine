@@ -1,7 +1,7 @@
 ﻿using ConsoleEngine.Systems;
 using IServiceProvider = DependencyInjection.IServiceProvider;
 
-namespace ConsoleEngine.Bootstrap.Implementations
+namespace ConsoleEngine.Game.Bootstrap.Implementations
 {
     internal class CompositionRoot : ICompositionRoot
     {

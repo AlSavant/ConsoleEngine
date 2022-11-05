@@ -2,7 +2,7 @@
 using ConsoleEngine.DependencyInjection.Windsor;
 using DependencyInjection.Windsor;
 
-namespace ConsoleEngine.Bootstrap.Implementations
+namespace ConsoleEngine.Game.Bootstrap.Implementations
 {
     internal class Bootstrapper
     {

@@ -1,7 +1,7 @@
-﻿using ConsoleEngine.Bootstrap.Implementations;
+﻿using ConsoleEngine.Game.Bootstrap.Implementations;
 using Nito.AsyncEx;
 
-namespace ConsoleEngine
+namespace ConsoleEngine.Game
 {
     internal class Startup
     {

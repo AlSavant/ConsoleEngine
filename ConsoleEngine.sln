@@ -5,7 +5,7 @@ VisualStudioVersion = 17.2.32630.192
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataModel", "DataModel\DataModel.csproj", "{CD0FBE44-14DC-4268-83E1-C49DE2CBCF40}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleEngine", "ConsoleEngine\ConsoleEngine.csproj", "{4AE0B212-F237-4EF2-9331-D655FE942F3B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleEngine.Game", "ConsoleEngine.Game\ConsoleEngine.Game.csproj", "{4AE0B212-F237-4EF2-9331-D655FE942F3B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DependencyInjection", "DependencyInjection\DependencyInjection.csproj", "{BCBB400F-C19C-4986-96B7-1C7DA14D6B00}"
 EndProject
