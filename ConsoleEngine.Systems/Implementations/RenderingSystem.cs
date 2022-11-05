@@ -1,4 +1,5 @@
-﻿using ConsoleEngine.Services.Repositories.Entity;
+﻿using ConsoleEngine.Services.Factories;
+using ConsoleEngine.Services.Repositories.Entity;
 using ConsoleEngine.Services.Util.Rendering;
 using ConsoleEngine.Services.Util.Scenes;
 using DataModel.Components;
@@ -50,14 +51,14 @@ namespace ConsoleEngine.Systems.Implementations
             ICameraRepositoryService cameraRepositoryService,
             IRendererRepositoryService rendererRepositoryService,
             IGUIRenderingService guiRenderingService)        
-        {
+        {                        
             this.sceneManagementService = sceneManagementService;
             this.guiRenderingService = guiRenderingService;
             this.cameraRepositoryService = cameraRepositoryService;
             this.rendererRepositoryService = rendererRepositoryService;
             handle = CreateFile("CONOUT$", 0x40000000, 2, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero);
             UpdateCharBuffer();
-        }
+        }        
 
         private void UpdateCharBuffer()
         {
@@ -90,7 +91,7 @@ namespace ConsoleEngine.Systems.Implementations
 
         private void RenderCameras(Scene scene)
         {
-            var terrain = scene.terrain;
+            Terrain terrain = scene.terrain;
             for(int i = 0; i < cameraRepositoryService.Count; i++)
             {
                 var camera = cameraRepositoryService.Get(i);

@@ -10,7 +10,7 @@ namespace ConsoleEngine.Services.Factories.Implementations
 
         public StaticDataFactory(IAssetManagementService assetManagementService)
         {
-            this.assetManagementService = assetManagementService;
+            this.assetManagementService = assetManagementService;            
         }
 
         public IEntityStaticData[] GetEntityStaticData()

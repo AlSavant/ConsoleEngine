@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<EntityStaticData>
+	<ID>camera</ID>
+	<displayName>Camera</displayName>
+	<dontDestroyOnSceneLoad>false</dontDestroyOnSceneLoad>
+	<components>
+		<TransformComponentStaticData></TransformComponentStaticData>
+		<CameraComponentStaticData></CameraComponentStaticData>
+	</components>	
+</EntityStaticData>

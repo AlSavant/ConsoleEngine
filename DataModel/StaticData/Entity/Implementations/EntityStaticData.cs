@@ -2,6 +2,7 @@
 using DataModel.StaticData.Component.Implementations;
 using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace DataModel.StaticData.Entity.Implementations
 {
@@ -28,8 +29,7 @@ namespace DataModel.StaticData.Entity.Implementations
 
         public bool dontDestroyOnSceneLoad;
         public bool DontDestroyOnSceneLoad { get { return dontDestroyOnSceneLoad; } }
-
-
+        
         public List<ComponentStaticData> components;
 
         public IComponentStaticData[] GetComponents()

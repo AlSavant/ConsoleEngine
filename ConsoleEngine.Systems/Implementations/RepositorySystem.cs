@@ -8,9 +8,7 @@ using System.Collections.Generic;
 namespace ConsoleEngine.Systems.Implementations
 {
     internal sealed class RepositorySystem : System, IRepositorySystem
-    {
-        private readonly IEntityFactory entityFactory;
-        private readonly IPropertyChangedSubscriberService subscriberService;
+    {        
         private readonly Dictionary<IEntityRepository, Type> repositoryTypeMap;
         private readonly IEntityRepository[] repositoryCollection;
 
@@ -19,9 +17,7 @@ namespace ConsoleEngine.Systems.Implementations
             IEntityRepositoryFactory entityRepositoryFactory,
             IPropertyChangedSubscriberService subscriberService)
         {
-            var repositories = entityRepositoryFactory.CreateRepositories();
-            this.entityFactory = entityFactory;
-            this.subscriberService = subscriberService;
+            var repositories = entityRepositoryFactory.CreateRepositories();           
             repositoryTypeMap = new Dictionary<IEntityRepository, Type>();
             repositoryCollection = new IEntityRepository[repositories.Count];
             int i = 0;
@@ -31,14 +27,15 @@ namespace ConsoleEngine.Systems.Implementations
                 repositoryTypeMap.Add(pair.Value, pair.Key);
                 i++;
             }
-        }
-
-        public override void Run()
-        {            
             ClearRepositories();
             subscriberService.Subscribe(entityFactory)
                              .AddActionForProperty("EntityCreated", OnEntityCreated)
                              .AddActionForProperty("EntityDestroyed", OnEntityDestroyed);
+        }
+
+        public override bool IsAutoRun()
+        {
+            return true;
         }
 
         private void OnEntityDestroyed(INotifyPropertyChanged arg1, IPropertyChangedEventArgs e)
@@ -75,12 +72,6 @@ namespace ConsoleEngine.Systems.Implementations
             {
                 repositoryCollection[i].Clear();
             }
-        }
-
-        public override void Stop()
-        {
-            ClearRepositories();
-            base.Stop();
-        }
+        }        
     }
 }

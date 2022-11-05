@@ -3,7 +3,7 @@ using System.Numerics;
 
 namespace DataModel.Components.Implementations
 {
-    public sealed class TranssformComponent : Component<ITransformComponentStaticData>, ITransformComponent
+    public sealed class TransformComponent : Component<ITransformComponentStaticData>, ITransformComponent
     {
         public Vector2 Position { get; set; }
 

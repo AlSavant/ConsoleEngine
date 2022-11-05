@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using DataModel.Components;
 
 namespace ConsoleEngine.Services.Repositories.Entity
 {
-    internal interface IRendererRepositoryService
+    public interface IRendererRepositoryService : IService, IEntityRepository<IRendererComponent>
     {
+
     }
 }

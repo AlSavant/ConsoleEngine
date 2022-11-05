@@ -1,21 +1,38 @@
 ﻿using ConsoleEngine.Services.AssetManagement.Strategies;
 using ConsoleEngine.Services.Factories;
+using DataModel.StaticData.Component.Implementations;
+using DataModel.StaticData.Entity.Implementations;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace ConsoleEngine.Services.AssetManagement.Implementations
 {
     internal sealed class AssetManagementService : IAssetManagementService
     {
+        private readonly XmlAttributeOverrides xmlAttributeOverrides;
         private readonly Dictionary<string, ISerializationStrategy> serializers;
         private readonly Dictionary<string, object> pool;
         private readonly string root;
         private readonly bool pathExists;
 
         public AssetManagementService(ISerializationStrategyFactory serializationStrategyFactory)
-        {            
+        {
+            xmlAttributeOverrides = new XmlAttributeOverrides();
+            var dataTypes = typeof(ComponentStaticData).Assembly.GetTypes().Where(x => !x.IsInterface && !x.IsAbstract && typeof(ComponentStaticData).IsAssignableFrom(x));
+            var attributes = new XmlAttributes();
+            foreach(var type in dataTypes)
+            {
+                attributes.XmlArrayItems.Add(new XmlArrayItemAttribute()
+                {
+                    ElementName = type.Name,
+                    Type = type
+                });
+            }            
+            xmlAttributeOverrides.Add(typeof(EntityStaticData), "components", attributes);
+
             root = AppDomain.CurrentDomain.BaseDirectory;
             root += "/Resources/";
             if (!Directory.Exists(root))
@@ -35,7 +52,7 @@ namespace ConsoleEngine.Services.AssetManagement.Implementations
             var fullPath = Path.Combine(root, path);
             if (!Directory.Exists(fullPath))
             {
-                return null;
+                return Array.Empty<T>();
             }
             var files = Directory.GetFiles(fullPath, "*.xml", SearchOption.AllDirectories);
             foreach (var file in files)
@@ -65,7 +82,7 @@ namespace ConsoleEngine.Services.AssetManagement.Implementations
         {            
             try
             {
-                var serializer = new XmlSerializer(typeof(T));
+                var serializer = new XmlSerializer(typeof(T), xmlAttributeOverrides);
                 using (Stream reader = new FileStream(fullPath, FileMode.Open))
                 {
                     return (T)serializer.Deserialize(reader);                    
