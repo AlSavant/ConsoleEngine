@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -12,10 +12,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Resources\StaticData\Entity\System\camera.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
+	  <EmbeddedResource Include="Resources\**\*.*">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </EmbeddedResource>
+  </ItemGroup>	  
 
   <ItemGroup>
     <PackageReference Include="Nito.AsyncEx.Context" Version="5.1.2" />
@@ -23,6 +23,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ConsoleEngine.DependencyInjection.Windsor\ConsoleEngine.DependencyInjection.Windsor.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Resources\Materials\" />
+    <Folder Include="Resources\Scenes\" />
+    <Folder Include="Resources\Terrains\" />
+    <Folder Include="Resources\Textures\" />
   </ItemGroup>
 
 </Project>
