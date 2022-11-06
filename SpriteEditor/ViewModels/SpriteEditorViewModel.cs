@@ -33,9 +33,9 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if (SetProperty(ref gridWidth, value, "GridWidth"))
+                if (SetProperty(ref gridWidth, value, nameof(GridWidth)))
                 {
-                    OnPropertyChanged("PixelWidth");
+                    OnPropertyChanged(nameof(PixelWidth));
                 }
             }
         }
@@ -48,7 +48,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                SetProperty(ref gridHeight, value, "GridHeight");
+                SetProperty(ref gridHeight, value, nameof(GridHeight));
             }
         }
 
@@ -69,7 +69,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if (SetProperty(ref supportsTransparency, value, "SupportsTransparency"))
+                if (SetProperty(ref supportsTransparency, value, nameof(SupportsTransparency)))
                 {
                     IsDirty = true;
                 }
@@ -85,9 +85,9 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if (SetProperty(ref showGrid, value, "ShowGrid"))
+                if (SetProperty(ref showGrid, value, nameof(ShowGrid)))
                 {
-                    OnPropertyChanged("GridColor");
+                    OnPropertyChanged(nameof(GridColor));
                 }
             }
         }
@@ -109,7 +109,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if (SetProperty(ref selectedCharacterIndex, value, "SelectedCharacterIndex"))
+                if (SetProperty(ref selectedCharacterIndex, value, nameof(SelectedCharacterIndex)))
                 {
                     SelectedCharacter = CharacterList[value];
                 }
@@ -127,7 +127,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if (SetProperty(ref selectedColorIndex, value, "SelectedColorIndex"))
+                if (SetProperty(ref selectedColorIndex, value, nameof(SelectedColorIndex)))
                 {
                     SelectedColor = ColorList[value];
 
@@ -145,7 +145,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                SetProperty(ref importedArt, value, "ImportedArt");
+                SetProperty(ref importedArt, value, nameof(ImportedArt));
             }
         }
 
@@ -158,7 +158,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                SetProperty(ref canPaintCharacters, value, "CanPaintCharacters");
+                SetProperty(ref canPaintCharacters, value, nameof(CanPaintCharacters));
             }
         }
 
@@ -179,9 +179,9 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if (SetProperty(ref isDirty, value, "IsDirty"))
+                if (SetProperty(ref isDirty, value, nameof(IsDirty)))
                 {
-                    OnPropertyChanged("CanSave");
+                    OnPropertyChanged(nameof(CanSave));
                 }
             }
         }
@@ -195,9 +195,9 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if (SetProperty(ref savePath, value, "SavePath"))
+                if (SetProperty(ref savePath, value, nameof(SavePath)))
                 {
-                    OnPropertyChanged("SavePath");
+                    OnPropertyChanged(nameof(SavePath));
                 }
             }
         }
@@ -211,7 +211,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                SetProperty(ref recentFiles, value, "RecentFiles");
+                SetProperty(ref recentFiles, value, nameof(RecentFiles));
             }
         }
 
@@ -301,7 +301,7 @@ namespace SpriteEditor.ViewModels
                 }
                 RecentFiles.Add(file);
             }
-            OnPropertyChanged("CanBrowseRecents");
+            OnPropertyChanged(nameof(CanBrowseRecents));
             IsDirty = false;
         }
 
@@ -310,10 +310,10 @@ namespace SpriteEditor.ViewModels
             if (History == null)
                 return;
             History.AddState(new HistoryState(actionName, GridWidth, GridHeight, Pixels));
-            OnPropertyChanged("UndoAction");
-            OnPropertyChanged("RedoAction");
-            OnPropertyChanged("CanUndo");
-            OnPropertyChanged("CanRedo");
+            OnPropertyChanged(nameof(UndoAction));
+            OnPropertyChanged(nameof(RedoAction));
+            OnPropertyChanged(nameof(CanUndo));
+            OnPropertyChanged(nameof(CanRedo));
         }
 
         private ICommand undoCommand;
@@ -387,14 +387,14 @@ namespace SpriteEditor.ViewModels
             gridWidth = state.GridWidth;
             gridHeight = state.GridHeight;
             Pixels.Reset(state.GetGridClone());
-            OnPropertyChanged("GridHeight");
-            OnPropertyChanged("GridWidth");
-            OnPropertyChanged("PixelWidth");
-            OnPropertyChanged("Pixels");
-            OnPropertyChanged("UndoAction");
-            OnPropertyChanged("RedoAction");
-            OnPropertyChanged("CanUndo");
-            OnPropertyChanged("CanRedo");
+            OnPropertyChanged(nameof(GridHeight));
+            OnPropertyChanged(nameof(GridWidth));
+            OnPropertyChanged(nameof(PixelWidth));
+            OnPropertyChanged(nameof(Pixels));
+            OnPropertyChanged(nameof(UndoAction));
+            OnPropertyChanged(nameof(RedoAction));
+            OnPropertyChanged(nameof(CanUndo));
+            OnPropertyChanged(nameof(CanRedo));
         }
 
         private void OnGridResized()
@@ -592,9 +592,9 @@ namespace SpriteEditor.ViewModels
                 }
             }
             ImportedArt = string.Empty;
-            OnPropertyChanged("GridHeight");
-            OnPropertyChanged("GridWidth");
-            OnPropertyChanged("PixelWidth");
+            OnPropertyChanged(nameof(GridHeight));
+            OnPropertyChanged(nameof(GridWidth));
+            OnPropertyChanged(nameof(PixelWidth));
             AddHistoryState("Import Art");
             IsDirty = true;
         }
@@ -635,8 +635,8 @@ namespace SpriteEditor.ViewModels
                     RecentFiles.Insert(0, SavePath);
                     Properties.Settings.Default.RecentFiles.Insert(0, SavePath);
                     Properties.Settings.Default.Save();
-                    OnPropertyChanged("RecentFiles");
-                    OnPropertyChanged("CanBrowseRecents");
+                    OnPropertyChanged(nameof(RecentFiles));
+                    OnPropertyChanged(nameof(CanBrowseRecents));
                 }
                 else
                 {
@@ -652,7 +652,7 @@ namespace SpriteEditor.ViewModels
                         RecentFiles[0] = saveFileDialog.FileName;
                         Properties.Settings.Default.RecentFiles[0] = saveFileDialog.FileName;
                         Properties.Settings.Default.Save();
-                        OnPropertyChanged("RecentFiles");
+                        OnPropertyChanged(nameof(RecentFiles));
                     }
                 }
             }
@@ -754,8 +754,8 @@ namespace SpriteEditor.ViewModels
                 RecentFiles.Remove(path);
                 Properties.Settings.Default.Save();
                 MessageBox.Show("The requested sprite file could not be found at the target location. Removing from list.", "Sprite not found", MessageBoxButton.OK);
-                OnPropertyChanged("RecentFiles");
-                OnPropertyChanged("CanBrowseRecents");
+                OnPropertyChanged(nameof(RecentFiles));
+                OnPropertyChanged(nameof(CanBrowseRecents));
                 return;
             }
             var formatter = new BinaryFormatter();
@@ -779,7 +779,7 @@ namespace SpriteEditor.ViewModels
                 RecentFiles[0] = path;
                 Properties.Settings.Default.RecentFiles[0] = path;
                 Properties.Settings.Default.Save();
-                OnPropertyChanged("RecentFiles");
+                OnPropertyChanged(nameof(RecentFiles));
             }
         }
 
@@ -849,11 +849,11 @@ namespace SpriteEditor.ViewModels
                         RecentFiles[0] = openFileDialog.FileName;
                         Properties.Settings.Default.RecentFiles[0] = openFileDialog.FileName;
                         Properties.Settings.Default.Save();
-                        OnPropertyChanged("RecentFiles");
+                        OnPropertyChanged(nameof(RecentFiles));
                     }
                 }
-                OnPropertyChanged("RecentFiles");
-                OnPropertyChanged("CanBrowseRecents");
+                OnPropertyChanged(nameof(RecentFiles));
+                OnPropertyChanged(nameof(CanBrowseRecents));
             }
         }
 
@@ -872,9 +872,9 @@ namespace SpriteEditor.ViewModels
             }
             Pixels.Reset(pixels);
             SupportsTransparency = sprite.isTransparent;
-            OnPropertyChanged("GridHeight");
-            OnPropertyChanged("GridWidth");
-            OnPropertyChanged("PixelWidth");
+            OnPropertyChanged(nameof(GridHeight));
+            OnPropertyChanged(nameof(GridWidth));
+            OnPropertyChanged(nameof(PixelWidth));
         }
 
         private bool DiscardChanges()
@@ -922,9 +922,9 @@ namespace SpriteEditor.ViewModels
             int h = gridHeight;
             gridWidth = h;
             gridHeight = w;
-            OnPropertyChanged("GridHeight");
-            OnPropertyChanged("GridWidth");
-            OnPropertyChanged("PixelWidth");
+            OnPropertyChanged(nameof(GridHeight));
+            OnPropertyChanged(nameof(GridWidth));
+            OnPropertyChanged(nameof(PixelWidth));
             AddHistoryState("Rotate Grid 90° CW");
             IsDirty = true;
         }
@@ -951,9 +951,9 @@ namespace SpriteEditor.ViewModels
             int h = gridHeight;
             gridWidth = h;
             gridHeight = w;
-            OnPropertyChanged("GridHeight");
-            OnPropertyChanged("GridWidth");
-            OnPropertyChanged("PixelWidth");
+            OnPropertyChanged(nameof(GridHeight));
+            OnPropertyChanged(nameof(GridWidth));
+            OnPropertyChanged(nameof(PixelWidth));
             AddHistoryState("Rotate Grid 90° CCW");
             IsDirty = true;
         }
@@ -1061,9 +1061,9 @@ namespace SpriteEditor.ViewModels
             gridWidth = viewModel.GridWidth;
             gridHeight = viewModel.GridHeight;
             Pixels.Reset(newPixels);
-            OnPropertyChanged("GridHeight");
-            OnPropertyChanged("GridWidth");
-            OnPropertyChanged("PixelWidth");
+            OnPropertyChanged(nameof(GridHeight));
+            OnPropertyChanged(nameof(GridWidth));
+            OnPropertyChanged(nameof(PixelWidth));
             AddHistoryState("Resize Grid");
             IsDirty = true;
         }

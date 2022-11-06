@@ -27,7 +27,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if (SetProperty(ref currentWidth, value, "CurrentWidth"))
+                if (SetProperty(ref currentWidth, value, nameof(CurrentWidth)))
                 {
                     UpdateGrid();
                 }
@@ -43,7 +43,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if (SetProperty(ref currentHeight, value, "CurrentHeight"))
+                if (SetProperty(ref currentHeight, value, nameof(CurrentHeight)))
                 {
                     UpdateGrid();
                 }
@@ -59,7 +59,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if (SetProperty(ref gridWidth, value, "GridWidth"))
+                if (SetProperty(ref gridWidth, value, nameof(GridWidth)))
                 {
                     UpdateGrid();
                 }
@@ -75,7 +75,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if (SetProperty(ref gridHeight, value, "GridHeight"))
+                if (SetProperty(ref gridHeight, value, nameof(GridHeight)))
                 {
                     UpdateGrid();
                 }
@@ -91,7 +91,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if (SetProperty(ref pivotIndex, value, "PivotIndex"))
+                if (SetProperty(ref pivotIndex, value, nameof(PivotIndex)))
                 {
                     UpdateGrid();
                 }

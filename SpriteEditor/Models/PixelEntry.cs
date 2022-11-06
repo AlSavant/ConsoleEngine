@@ -24,7 +24,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                SetProperty(ref character, value, "Character");
+                SetProperty(ref character, value, nameof(Character));
             }
         }
 
@@ -37,7 +37,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                SetProperty(ref color, value, "Color");
+                SetProperty(ref color, value, nameof(Color));
             }
         }
 
