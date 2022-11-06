@@ -10,5 +10,6 @@ namespace ConsoleEngine.Services.Util.Resources
         string GetFullAssetPath(string relativeAssetPath);
         string GetDirectoryName(string relativePath);
         string GetFormattedPath(string path);
+        string GetFileName(string relativePath);
     }
 }

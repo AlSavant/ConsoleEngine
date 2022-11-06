@@ -89,7 +89,7 @@ namespace ConsoleEngine.Services.AssetManagement.Implementations
                 return (T)pool[path];
             }
             string directory = resourcePathParsingService.GetDirectoryName(path);
-            string fileName = resourcePathParsingService.GetFullAssetPath(path);
+            string fileName = resourcePathParsingService.GetFileName(path);
 
             DirectoryInfo dir = new DirectoryInfo(directory);
             FileInfo[] files = dir.GetFiles(fileName + ".*");

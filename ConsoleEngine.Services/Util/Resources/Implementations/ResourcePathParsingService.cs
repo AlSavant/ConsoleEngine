@@ -38,6 +38,11 @@ namespace ConsoleEngine.Services.Util.Resources.Implementations
             return Path.GetDirectoryName(root + relativePath);
         }
 
+        public string GetFileName(string relativePath)
+        {
+            return Path.GetFileName(root + relativePath);
+        }
+
         public string GetFormattedPath(string path)
         {
             var formattedPath = path.Replace("\\", "/");

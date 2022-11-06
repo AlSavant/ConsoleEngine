@@ -30,7 +30,7 @@ namespace ConsoleEngine.Services.AssetManagement.Strategies.Implementations
                     {
                         foreach (var layer in mat.layers)
                         {
-                            layer.texture = (Sprite)binaryStrategy.Deserialize(resourcePathParsingService.GetFullAssetPath(layer.texturePath));
+                            layer.texture = (Sprite)binaryStrategy.Deserialize(resourcePathParsingService.GetFullAssetPath(layer.texturePath)+".csp");
                         }                        
                     }
                     return mat;

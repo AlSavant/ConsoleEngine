@@ -47,8 +47,7 @@ namespace ConsoleEngine.Systems.Implementations
         private SmallRect bufferRect;
         private Vector2Int screenSize;
 
-        public RenderingSystem(
-            IAssetManagementService assetManagementService,
+        public RenderingSystem(            
             ISceneManagementService sceneManagementService,
             ICameraRepositoryService cameraRepositoryService,
             IRendererRepositoryService rendererRepositoryService,
@@ -57,9 +56,7 @@ namespace ConsoleEngine.Systems.Implementations
             this.sceneManagementService = sceneManagementService;
             this.guiRenderingService = guiRenderingService;
             this.cameraRepositoryService = cameraRepositoryService;
-            this.rendererRepositoryService = rendererRepositoryService;
-            var skybox = assetManagementService.Load<SkyboxMaterial>("Materials/Skyboxes/Skybox");
-            var count = skybox.layers.Length;
+            this.rendererRepositoryService = rendererRepositoryService;           
             handle = CreateFile("CONOUT$", 0x40000000, 2, IntPtr.Zero, FileMode.Open, 0, IntPtr.Zero);
             UpdateCharBuffer();
         }        
