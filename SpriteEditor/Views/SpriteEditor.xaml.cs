@@ -1,8 +1,8 @@
-﻿using System.Windows;
-using SpriteEditor.ViewModels;
+﻿using SpriteEditor.ViewModels;
+using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 
 namespace SpriteEditor
@@ -68,9 +68,9 @@ namespace SpriteEditor
             var s = Keyboard.IsKeyDown(Key.S);
             var shift = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
             var context = (SpriteEditorViewModel)DataContext;
-            if(s)
+            if (s)
             {
-                if(shift)
+                if (shift)
                 {
                     //Save as...
                     if (context.IsDirty)
@@ -79,22 +79,22 @@ namespace SpriteEditor
                 else
                 {
                     //Save
-                    if(context.CanSave)
+                    if (context.CanSave)
                         context.SaveFileCommand.Execute(this);
-                    else if(context.IsDirty)
+                    else if (context.IsDirty)
                         context.SaveFileWithLocationCommand.Execute(this);
                 }
                 return;
             }
             var n = Keyboard.IsKeyDown(Key.N);
-            if(n)
+            if (n)
             {
                 context.NewSpriteCommand.Execute(this);
                 return;
             }
 
             var o = Keyboard.IsKeyDown(Key.O);
-            if(o)
+            if (o)
             {
                 context.OpenSpriteCommand.Execute(this);
                 return;
@@ -102,13 +102,13 @@ namespace SpriteEditor
 
             var z = Keyboard.IsKeyDown(Key.Z);
             var y = Keyboard.IsKeyDown(Key.Y);
-            if(z)
+            if (z)
             {
                 //Undo
                 context.Undo();
                 return;
             }
-            if(y)
+            if (y)
             {
                 //Redo
                 context.Redo();

@@ -1,24 +1,25 @@
-﻿using System;
-using System.Text;
-using SpriteEditor.Models;
-using System.Collections.ObjectModel;
-using System.Windows.Input;
-using SpriteEditor.Commands;
-using System.Linq;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
+﻿using DataModel.Math.Structures;
+using DataModel.Rendering;
 using Microsoft.Win32;
-using System.Windows;
-using System.Windows.Media;
-using System.Collections.Generic;
-using System.Collections.Specialized;
+using SpriteEditor.Commands;
+using SpriteEditor.Models;
 using SpriteEditor.Util;
 using SpriteEditor.Views;
-using DataModel.Rendering;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.IO;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media;
 
 namespace SpriteEditor.ViewModels
 {
-    public class SpriteEditorViewModel : ViewModel
+    internal sealed class SpriteEditorViewModel : ViewModel
     {
         public ObservableCollection<char> CharacterList { get; set; }
         public ObservableCollection<ColorEntry> ColorList { get; set; }
@@ -31,9 +32,9 @@ namespace SpriteEditor.ViewModels
                 return gridWidth;
             }
             set
-            {                
-                if(SetProperty(ref gridWidth, value, "GridWidth"))
-                {                    
+            {
+                if (SetProperty(ref gridWidth, value, "GridWidth"))
+                {
                     OnPropertyChanged("PixelWidth");
                 }
             }
@@ -51,13 +52,13 @@ namespace SpriteEditor.ViewModels
             }
         }
 
-        public int PixelWidth 
-        { 
-            get 
-            { 
-                return GridWidth * 20; 
-            } 
-        }        
+        public int PixelWidth
+        {
+            get
+            {
+                return GridWidth * 20;
+            }
+        }
 
         private bool supportsTransparency;
         public bool SupportsTransparency
@@ -68,9 +69,9 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if(SetProperty(ref supportsTransparency, value, "SupportsTransparency"))
+                if (SetProperty(ref supportsTransparency, value, "SupportsTransparency"))
                 {
-                    IsDirty = true;                    
+                    IsDirty = true;
                 }
             }
         }
@@ -85,18 +86,18 @@ namespace SpriteEditor.ViewModels
             set
             {
                 if (SetProperty(ref showGrid, value, "ShowGrid"))
-                {                    
+                {
                     OnPropertyChanged("GridColor");
                 }
             }
         }
 
-        public SolidColorBrush GridColor 
-        { 
+        public SolidColorBrush GridColor
+        {
             get
             {
                 return ShowGrid ? new SolidColorBrush(Colors.White) : new SolidColorBrush(Colors.Black);
-            } 
+            }
         }
 
         private int selectedCharacterIndex = 0;
@@ -194,7 +195,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if(SetProperty(ref savePath, value, "SavePath"))
+                if (SetProperty(ref savePath, value, "SavePath"))
                 {
                     OnPropertyChanged("SavePath");
                 }
@@ -220,7 +221,7 @@ namespace SpriteEditor.ViewModels
             {
                 return RecentFiles.Count > 0;
             }
-        }                
+        }
         public SmartCollection<PixelEntry> Pixels { get; set; }
 
         public SpriteEditorViewModel()
@@ -256,22 +257,22 @@ namespace SpriteEditor.ViewModels
             var space = encoding.GetString(new byte[] { 32 });
             CharacterList.Add(space[0]);
             charLookup.Add(space[0], 32);
-            for(byte i = 0; i < 255; i++)
+            for (byte i = 0; i < 255; i++)
             {
                 char c = (char)i;
                 if (char.IsControl(c))
                     continue;
                 if (char.IsWhiteSpace(c))
-                    continue;                
+                    continue;
                 var s = encoding.GetString(new byte[] { i });
                 charLookup.Add(s[0], i);
                 CharacterList.Add(s[0]);
-            }            
+            }
             ColorList = new ObservableCollection<ColorEntry>();
             var consoleColors = (ConsoleColor[])Enum.GetValues(typeof(ConsoleColor));
-            for(int i = 0; i < consoleColors.Length; i++)
+            for (int i = 0; i < consoleColors.Length; i++)
             {
-                var entry = ColorEntry.FromConsoleColor(consoleColors[i]);                
+                var entry = ColorEntry.FromConsoleColor(consoleColors[i]);
                 ColorList.Add(entry);
             }
             var last = ColorList[ColorList.Count - 1];
@@ -284,19 +285,19 @@ namespace SpriteEditor.ViewModels
             History = new History(3);
             AddHistoryState("");
             RecentFiles = new ObservableCollection<string>();
-            if(Properties.Settings.Default.RecentFiles == null)
+            if (Properties.Settings.Default.RecentFiles == null)
             {
                 Properties.Settings.Default.RecentFiles = new StringCollection();
                 Properties.Settings.Default.Save();
             }
-            for(int i = Properties.Settings.Default.RecentFiles.Count - 1; i >= 0; i--)
+            for (int i = Properties.Settings.Default.RecentFiles.Count - 1; i >= 0; i--)
             {
                 var file = Properties.Settings.Default.RecentFiles[i];
-                if(!File.Exists(file))
+                if (!File.Exists(file))
                 {
                     Properties.Settings.Default.RecentFiles.RemoveAt(i);
                     Properties.Settings.Default.Save();
-                    continue;                    
+                    continue;
                 }
                 RecentFiles.Add(file);
             }
@@ -398,10 +399,10 @@ namespace SpriteEditor.ViewModels
 
         private void OnGridResized()
         {
-            var pixels = new List<PixelEntry>(GridHeight * GridWidth);            
+            var pixels = new List<PixelEntry>(GridHeight * GridWidth);
             for (int i = 0; i < GridHeight * GridWidth; i++)
             {
-                pixels.Add(PixelEntry.Default);                
+                pixels.Add(PixelEntry.Default);
             }
             Pixels.Reset(pixels);
             AddHistoryState("Resize Grid");
@@ -427,26 +428,26 @@ namespace SpriteEditor.ViewModels
         {
             PixelEntry pixel = (PixelEntry)param;
             bool dirtyPixel = false;
-            if(CanPaintCharacters)
+            if (CanPaintCharacters)
             {
-                if(pixel.Character != SelectedCharacter)
+                if (pixel.Character != SelectedCharacter)
                 {
                     dirtyPixel = true;
-                    pixel.Character = SelectedCharacter;                    
+                    pixel.Character = SelectedCharacter;
                 }
-                
+
             }
-            if(pixel.Color != SelectedColor)
+            if (pixel.Color != SelectedColor)
             {
                 dirtyPixel = true;
-                pixel.Color = SelectedColor;               
-            }            
-            if(dirtyPixel)
+                pixel.Color = SelectedColor;
+            }
+            if (dirtyPixel)
             {
                 AddHistoryState("Paint Pixel");
                 IsDirty = true;
             }
-                
+
         }
 
         private ICommand fillCommand;
@@ -467,29 +468,29 @@ namespace SpriteEditor.ViewModels
         private void Fill()
         {
             bool dirtyFill = false;
-            for(int i = 0; i < Pixels.Count; i++)
+            for (int i = 0; i < Pixels.Count; i++)
             {
-                if(CanPaintCharacters)
+                if (CanPaintCharacters)
                 {
-                    if(Pixels[i].Character != SelectedCharacter)
+                    if (Pixels[i].Character != SelectedCharacter)
                     {
                         Pixels[i].Character = SelectedCharacter;
                         dirtyFill = true;
-                    }                    
+                    }
                 }
-                if(Pixels[i].Color != SelectedColor)
+                if (Pixels[i].Color != SelectedColor)
                 {
                     dirtyFill = true;
                     Pixels[i].Color = SelectedColor;
                 }
-                
+
             }
-            if(dirtyFill)
+            if (dirtyFill)
             {
                 AddHistoryState("Fill");
                 IsDirty = true;
             }
-                
+
         }
 
         private ICommand clearCommand;
@@ -504,7 +505,7 @@ namespace SpriteEditor.ViewModels
                     );
                 }
                 return clearCommand;
-            }            
+            }
         }
 
         private void Clear()
@@ -512,27 +513,27 @@ namespace SpriteEditor.ViewModels
             bool dirtyClear = false;
             for (int i = 0; i < Pixels.Count; i++)
             {
-                if(CanPaintCharacters)
+                if (CanPaintCharacters)
                 {
-                    if(Pixels[i].Character != ' ')
+                    if (Pixels[i].Character != ' ')
                     {
                         dirtyClear = true;
                         Pixels[i].Character = ' ';
-                    }                    
+                    }
                 }
-                if(Pixels[i].Color.ConsoleColor != ConsoleColor.Black)
+                if (Pixels[i].Color.ConsoleColor != ConsoleColor.Black)
                 {
                     dirtyClear = true;
                     Pixels[i].Color = ColorEntry.FromConsoleColor(ConsoleColor.Black);
                 }
-                
+
             }
-            if(dirtyClear)
+            if (dirtyClear)
             {
                 AddHistoryState("Clear");
                 IsDirty = true;
             }
-                
+
         }
 
         private ICommand importArtCommand;
@@ -570,7 +571,7 @@ namespace SpriteEditor.ViewModels
             int leftPad = lines.Length <= 1 ? 0 : -1;
             GridWidth = ordered.First().Length + leftPad;
             OnGridResized();
-            for(int y = 0; y < lines.Length; y++)
+            for (int y = 0; y < lines.Length; y++)
             {
                 var line = lines[y];
                 for (int x = 0; x < GridWidth; x++)
@@ -578,7 +579,7 @@ namespace SpriteEditor.ViewModels
                     if (x >= line.Length)
                         continue;
                     var pixel = Pixels[y * GridWidth + x];
-                    if(charLookup.ContainsKey(line[x]))
+                    if (charLookup.ContainsKey(line[x]))
                     {
                         pixel.Character = line[x];
                         pixel.Color = SelectedColor;
@@ -587,9 +588,9 @@ namespace SpriteEditor.ViewModels
                     {
                         pixel.Character = InvalidCharacter;
                         pixel.Color = ColorEntry.FromConsoleColor(ConsoleColor.Black);
-                    }                    
+                    }
                 }
-            }            
+            }
             ImportedArt = string.Empty;
             OnPropertyChanged("GridHeight");
             OnPropertyChanged("GridWidth");
@@ -617,7 +618,7 @@ namespace SpriteEditor.ViewModels
         {
             SaveFileDialog saveFileDialog = new SaveFileDialog();
             saveFileDialog.Filter = "Console Sprite (*.csp)|*.csp";
-            if(SavePath == string.Empty)
+            if (SavePath == string.Empty)
             {
                 saveFileDialog.InitialDirectory = Environment.CurrentDirectory;
             }
@@ -629,7 +630,7 @@ namespace SpriteEditor.ViewModels
             {
                 SavePath = saveFileDialog.FileName;
                 SaveFile();
-                if(!RecentFiles.Contains(SavePath))
+                if (!RecentFiles.Contains(SavePath))
                 {
                     RecentFiles.Insert(0, SavePath);
                     Properties.Settings.Default.RecentFiles.Insert(0, SavePath);
@@ -655,7 +656,7 @@ namespace SpriteEditor.ViewModels
                     }
                 }
             }
-                
+
         }
 
         private ICommand saveFileCommand;
@@ -677,9 +678,9 @@ namespace SpriteEditor.ViewModels
         {
             var colors = new byte[GridWidth * GridHeight];
             var characters = new byte[colors.Length];
-            for(int i = 0; i < Pixels.Count; i++)
+            for (int i = 0; i < Pixels.Count; i++)
             {
-                if(Pixels[i].Color.ConsoleColor == ConsoleColor.Black || Pixels[i].Character == ' ')
+                if (Pixels[i].Color.ConsoleColor == ConsoleColor.Black || Pixels[i].Character == ' ')
                 {
                     colors[i] = (byte)ConsoleColor.Black;
                     characters[i] = (byte)' ';
@@ -715,7 +716,7 @@ namespace SpriteEditor.ViewModels
         {
             if (!DiscardChanges())
                 return;
-            if(GridWidth == 20 && GridHeight == 20)
+            if (GridWidth == 20 && GridHeight == 20)
             {
                 Clear();
             }
@@ -724,7 +725,7 @@ namespace SpriteEditor.ViewModels
                 gridWidth = 20;
                 gridHeight = 20;
                 OnGridResized();
-            }            
+            }
             ShowGrid = true;
             IsDirty = false;
         }
@@ -767,7 +768,7 @@ namespace SpriteEditor.ViewModels
             SavePath = path;
 
             int idx = RecentFiles.IndexOf(path);
-            if(idx > 0)
+            if (idx > 0)
             {
                 for (int i = 0; i < idx; i++)
                 {
@@ -779,7 +780,7 @@ namespace SpriteEditor.ViewModels
                 Properties.Settings.Default.RecentFiles[0] = path;
                 Properties.Settings.Default.Save();
                 OnPropertyChanged("RecentFiles");
-            }                      
+            }
         }
 
         private ICommand openSpriteCommand;
@@ -816,7 +817,7 @@ namespace SpriteEditor.ViewModels
                 var filePath = openFileDialog.FileName;
                 var formatter = new BinaryFormatter();
                 var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
-                var sprite = (Sprite)formatter.Deserialize(stream);                
+                var sprite = (Sprite)formatter.Deserialize(stream);
                 stream.Close();
                 ApplySprite(sprite);
                 IsDirty = false;
@@ -827,7 +828,7 @@ namespace SpriteEditor.ViewModels
                 {
                     RecentFiles.Insert(0, SavePath);
                     Properties.Settings.Default.RecentFiles.Insert(0, SavePath);
-                    if(RecentFiles.Count > 10)
+                    if (RecentFiles.Count > 10)
                     {
                         RecentFiles.RemoveAt(10);
                         Properties.Settings.Default.RecentFiles.RemoveAt(10);
@@ -873,7 +874,7 @@ namespace SpriteEditor.ViewModels
             SupportsTransparency = sprite.isTransparent;
             OnPropertyChanged("GridHeight");
             OnPropertyChanged("GridWidth");
-            OnPropertyChanged("PixelWidth");            
+            OnPropertyChanged("PixelWidth");
         }
 
         private bool DiscardChanges()
@@ -920,7 +921,7 @@ namespace SpriteEditor.ViewModels
             int w = gridWidth;
             int h = gridHeight;
             gridWidth = h;
-            gridHeight = w;            
+            gridHeight = w;
             OnPropertyChanged("GridHeight");
             OnPropertyChanged("GridWidth");
             OnPropertyChanged("PixelWidth");
@@ -974,7 +975,7 @@ namespace SpriteEditor.ViewModels
 
         private void RotateGrid180()
         {
-            Pixels.Reset(MatrixUtil.RotateMatrix180(Pixels.ToArray(), GridWidth, GridHeight));            
+            Pixels.Reset(MatrixUtil.RotateMatrix180(Pixels.ToArray(), GridWidth, GridHeight));
             AddHistoryState("Rotate Grid 180°");
             IsDirty = true;
         }
@@ -1050,16 +1051,16 @@ namespace SpriteEditor.ViewModels
                 return;
             int x = viewModel.PivotIndex % 3;
             int y = viewModel.PivotIndex / 3;
-            Vector2Int normalizedPivot = new Vector2Int(x, y);            
+            Vector2Int normalizedPivot = new Vector2Int(x, y);
             var newPixels = MatrixUtil.ResizeMatrix(Pixels.ToArray(), GridWidth, GridHeight, viewModel.GridWidth, viewModel.GridHeight, normalizedPivot);
-            for(int i = 0; i < newPixels.Length; i++)
+            for (int i = 0; i < newPixels.Length; i++)
             {
                 if (newPixels[i] == null)
                     newPixels[i] = PixelEntry.Default;
             }
             gridWidth = viewModel.GridWidth;
             gridHeight = viewModel.GridHeight;
-            Pixels.Reset(newPixels);            
+            Pixels.Reset(newPixels);
             OnPropertyChanged("GridHeight");
             OnPropertyChanged("GridWidth");
             OnPropertyChanged("PixelWidth");
@@ -1070,6 +1071,6 @@ namespace SpriteEditor.ViewModels
         private void QuitApplication()
         {
             Application.Current.Shutdown();
-        }        
+        }
     }
 }

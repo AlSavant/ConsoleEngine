@@ -4,7 +4,7 @@ using System.Windows.Input;
 
 namespace SpriteEditor.Commands
 {
-    public class RelayCommand : ICommand
+    internal sealed class RelayCommand : ICommand
     {
         #region Fields
 

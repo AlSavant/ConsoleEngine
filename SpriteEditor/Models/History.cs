@@ -2,7 +2,7 @@
 
 namespace SpriteEditor.Models
 {
-    public class History
+    internal sealed class History
     {
         private int MaxCount { get; set; }
         private int Index { get; set; }
@@ -15,7 +15,7 @@ namespace SpriteEditor.Models
         {
             get
             {
-                if(CanUndo)
+                if (CanUndo)
                 {
                     return States[Index].StateName;
                 }
@@ -54,10 +54,10 @@ namespace SpriteEditor.Models
 
         public void AddState(HistoryState state)
         {
-            if(CanRedo)
+            if (CanRedo)
             {
                 var newStates = new List<HistoryState>(Index + 1);
-                for(int i = 0; i < Index + 1; i++)
+                for (int i = 0; i < Index + 1; i++)
                 {
                     newStates.Add(States[i]);
                 }

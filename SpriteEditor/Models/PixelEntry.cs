@@ -2,7 +2,7 @@
 
 namespace SpriteEditor.ViewModels
 {
-    public class PixelEntry : ViewModel
+    internal sealed class PixelEntry : ViewModel
     {
         public static PixelEntry Default
         {

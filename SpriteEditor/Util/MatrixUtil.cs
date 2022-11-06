@@ -1,9 +1,8 @@
-﻿using SpriteEditor.Models;
-using System;
+﻿using DataModel.Math.Structures;
 
 namespace SpriteEditor.Util
 {
-    public static class MatrixUtil
+    internal static class MatrixUtil
     {
         public static T[] FlipMatrixHorizontally<T>(T[] matrix, int matrixWidth, int matrixHeight)
         {
@@ -59,7 +58,7 @@ namespace SpriteEditor.Util
         public static T[] RotateMatrix90CW<T>(T[] matrix, int matrixWidth, int matrixHeight)
         {
             T[] dest = new T[matrixWidth * matrixHeight];
-            for(int i = 0; i < matrix.Length; i++)
+            for (int i = 0; i < matrix.Length; i++)
             {
                 int oldX = i % matrixWidth;
                 int oldY = i / matrixWidth;
@@ -68,7 +67,7 @@ namespace SpriteEditor.Util
                 int newY = oldX;
 
                 dest[newY * matrixHeight + newX] = matrix[oldY * matrixWidth + oldX];
-                
+
             }
             return dest;
         }
@@ -103,7 +102,7 @@ namespace SpriteEditor.Util
             {
                 pivotX = halfWidth - newHalfWidth;
             }
-            if(normalizedPivot.x == 2)
+            if (normalizedPivot.x == 2)
             {
                 pivotX = matrixWidth - newWidth;
             }
@@ -126,7 +125,7 @@ namespace SpriteEditor.Util
                 int oldY = pivotY + newY;
                 if (oldY < 0 || oldY >= matrixHeight)
                     continue;
-                dest[newY * newWidth + newX] = matrix[oldY * matrixWidth + oldX];                
+                dest[newY * newWidth + newX] = matrix[oldY * matrixWidth + oldX];
             }
             return dest;
         }

@@ -3,7 +3,7 @@ using System.Windows.Media;
 
 namespace SpriteEditor.Models
 {
-    public struct ColorEntry : IEquatable<ColorEntry>
+    internal struct ColorEntry : IEquatable<ColorEntry>
     {
         public SolidColorBrush MediaColor { get; set; }
         public ConsoleColor ConsoleColor { get; set; }

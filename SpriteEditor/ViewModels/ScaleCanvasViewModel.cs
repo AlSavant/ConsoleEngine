@@ -1,11 +1,11 @@
-﻿using SpriteEditor.Models;
-using SpriteEditor.Commands;
-using System.Windows.Input;
+﻿using SpriteEditor.Commands;
+using SpriteEditor.Models;
 using System.Windows;
+using System.Windows.Input;
 
 namespace SpriteEditor.ViewModels
 {
-    public class ScaleCanvasViewModel : ViewModel
+    internal sealed class ScaleCanvasViewModel : ViewModel
     {
         private const char EMPTY = ' ';
         private const char TOP_LEFT = '↖';
@@ -27,7 +27,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if(SetProperty(ref currentWidth, value, "CurrentWidth"))
+                if (SetProperty(ref currentWidth, value, "CurrentWidth"))
                 {
                     UpdateGrid();
                 }
@@ -43,7 +43,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if(SetProperty(ref currentHeight, value, "CurrentHeight"))
+                if (SetProperty(ref currentHeight, value, "CurrentHeight"))
                 {
                     UpdateGrid();
                 }
@@ -59,7 +59,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if(SetProperty(ref gridWidth, value, "GridWidth"))
+                if (SetProperty(ref gridWidth, value, "GridWidth"))
                 {
                     UpdateGrid();
                 }
@@ -75,7 +75,7 @@ namespace SpriteEditor.ViewModels
             }
             set
             {
-                if(SetProperty(ref gridHeight, value, "GridHeight"))
+                if (SetProperty(ref gridHeight, value, "GridHeight"))
                 {
                     UpdateGrid();
                 }
@@ -83,20 +83,20 @@ namespace SpriteEditor.ViewModels
         }
 
         private int pivotIndex = 4;
-        public int PivotIndex 
-        { 
-            get 
+        public int PivotIndex
+        {
+            get
             {
                 return pivotIndex;
-            } 
+            }
             set
             {
-                if(SetProperty(ref pivotIndex, value, "PivotIndex"))
+                if (SetProperty(ref pivotIndex, value, "PivotIndex"))
                 {
                     UpdateGrid();
                 }
             }
-        }        
+        }
 
         public bool ApplyChanges { get; set; }
 
@@ -120,16 +120,16 @@ namespace SpriteEditor.ViewModels
             char[] chars = new char[9];
             int pX = PivotIndex % 3;
             int pY = PivotIndex / 3;
-            for(int x = 0; x < 3; x++)
+            for (int x = 0; x < 3; x++)
             {
-                for(int y = 0; y < 3; y++)
+                for (int y = 0; y < 3; y++)
                 {
                     int currentIndex = y * 3 + x;
-                    if(currentIndex == PivotIndex)
+                    if (currentIndex == PivotIndex)
                     {
                         chars[currentIndex] = PIVOT;
                         continue;
-                    }                    
+                    }
 
                     //Top Middle
                     if (x == pX && y == pY - 1)

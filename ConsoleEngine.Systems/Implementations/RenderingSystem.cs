@@ -1,6 +1,4 @@
-﻿using ConsoleEngine.Services.AssetManagement;
-using ConsoleEngine.Services.Factories;
-using ConsoleEngine.Services.Repositories.Entity;
+﻿using ConsoleEngine.Services.Repositories.Entity;
 using ConsoleEngine.Services.Util.Rendering;
 using ConsoleEngine.Services.Util.Scenes;
 using DataModel.Components;

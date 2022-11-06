@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SpriteEditor.Models
 {
-    public struct HistoryState
+    internal struct HistoryState
     {
         public string StateName { get; set; }
         public List<PixelEntry> Grid { get; set; }
@@ -12,16 +12,16 @@ namespace SpriteEditor.Models
 
         public HistoryState(string name, int width, int height, SmartCollection<PixelEntry> grid)
         {
-            StateName = name;            
+            StateName = name;
             GridWidth = width;
             GridHeight = height;
             Grid = new List<PixelEntry>(grid.Count);
-            for(int i = 0; i < grid.Count; i++)
+            for (int i = 0; i < grid.Count; i++)
             {
                 Grid.Add(grid[i].Clone());
             }
         }
-        
+
         public List<PixelEntry> GetGridClone()
         {
             var grid = new List<PixelEntry>(Grid.Count);
