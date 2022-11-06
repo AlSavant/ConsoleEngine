@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <None Remove="Resources\Materials\Skyboxes\Skybox.sky" />
-    <None Remove="Resources\StaticData\Entity\System\camera.xml" />
+    <None Remove="Resources\StaticData\Entity\Core\camera.xml" />
   </ItemGroup>
 
   <ItemGroup>
