@@ -3,10 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SpriteEditor"
-		xmlns:models="clr-namespace:SpriteEditor.Models"
+		xmlns:models="clr-namespace:SpriteEditor.Models" 
+        xmlns:viewmodels="clr-namespace:SpriteEditor.ViewModels" d:DataContext="{d:DesignInstance Type=viewmodels:SpriteEditorViewModel}"
         mc:Ignorable="d"
-		Icon="/SpriteEditor;component/Resources/editor_icon.png"
         Title="Sprite Editor" Height="600" Width="1000" Name="SpriteEditor" KeyDown="SpriteEditor_KeyDown">
 	<Grid>
 		<Grid.RowDefinitions>
