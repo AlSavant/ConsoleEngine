@@ -1,4 +1,5 @@
 ﻿using SpriteEditor.ViewModels;
+using SpriteEditor.Views;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -10,12 +11,11 @@ namespace SpriteEditor
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IView<ISpriteEditorViewModel>
     {
         public MainWindow()
         {
-            InitializeComponent();
-            DataContext = new SpriteEditorViewModel();
+            InitializeComponent();            
         }
 
         //Collapse MenuItem when item is clicked

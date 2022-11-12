@@ -5,7 +5,7 @@ using System.Windows.Input;
 
 namespace SpriteEditor.ViewModels
 {
-    internal sealed class ScaleCanvasViewModel : ViewModel
+    internal sealed class ScaleCanvasViewModel : ViewModel, IScaleCanvasViewModel
     {
         private const char EMPTY = ' ';
         private const char TOP_LEFT = '↖';

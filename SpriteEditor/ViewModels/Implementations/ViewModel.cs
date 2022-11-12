@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace SpriteEditor.ViewModels
 {
-    internal abstract class ViewModel : INotifyPropertyChanged
+    internal abstract class ViewModel : IViewModel, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -3,6 +3,7 @@ using DataModel.Rendering;
 using Microsoft.Win32;
 using SpriteEditor.Commands;
 using SpriteEditor.Models;
+using SpriteEditor.Services.Factories;
 using SpriteEditor.Util;
 using SpriteEditor.Views;
 using System;
@@ -19,7 +20,7 @@ using System.Windows.Media;
 
 namespace SpriteEditor.ViewModels
 {
-    internal sealed class SpriteEditorViewModel : ViewModel
+    internal sealed class SpriteEditorViewModel : ViewModel, ISpriteEditorViewModel
     {
         public ObservableCollection<char> CharacterList { get; set; }
         public ObservableCollection<ColorEntry> ColorList { get; set; }
@@ -224,8 +225,11 @@ namespace SpriteEditor.ViewModels
         }
         public SmartCollection<PixelEntry> Pixels { get; set; }
 
-        public SpriteEditorViewModel()
+        private readonly IViewFactory viewFactory;
+
+        public SpriteEditorViewModel(IViewFactory viewFactory)
         {
+            this.viewFactory = viewFactory;
             Setup();
         }
 
@@ -1041,7 +1045,7 @@ namespace SpriteEditor.ViewModels
 
         private void OpenCanvasDialog()
         {
-            var view = new ScaleCanvasView();
+            var view = viewFactory.CreateView<ScaleCanvasView>();            
             var viewModel = (ScaleCanvasViewModel)view.DataContext;
             viewModel.Setup(GridWidth, GridHeight);
             view.ShowDialog();
