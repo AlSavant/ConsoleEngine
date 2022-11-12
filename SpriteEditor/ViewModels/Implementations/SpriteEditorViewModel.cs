@@ -4,7 +4,7 @@ using Microsoft.Win32;
 using SpriteEditor.Commands;
 using SpriteEditor.Models;
 using SpriteEditor.Services.Factories;
-using SpriteEditor.Util;
+using SpriteEditor.Services.Util;
 using SpriteEditor.Views;
 using System;
 using System.Collections.Generic;
@@ -226,10 +226,12 @@ namespace SpriteEditor.ViewModels
         public SmartCollection<PixelEntry> Pixels { get; set; }
 
         private readonly IViewFactory viewFactory;
+        private readonly IMatrixOperationsService matrixOperationsService;
 
-        public SpriteEditorViewModel(IViewFactory viewFactory)
+        public SpriteEditorViewModel(IViewFactory viewFactory, IMatrixOperationsService matrixOperationsService)
         {
-            this.viewFactory = viewFactory;
+            this.viewFactory = viewFactory;            
+            this.matrixOperationsService = matrixOperationsService;
             Setup();
         }
 
@@ -921,7 +923,7 @@ namespace SpriteEditor.ViewModels
 
         private void RotateGrid90CW()
         {
-            Pixels.Reset(MatrixUtil.RotateMatrix90CW(Pixels.ToArray(), GridWidth, GridHeight));
+            Pixels.Reset(matrixOperationsService.RotateMatrix90CW(Pixels.ToArray(), GridWidth, GridHeight));
             int w = gridWidth;
             int h = gridHeight;
             gridWidth = h;
@@ -950,7 +952,7 @@ namespace SpriteEditor.ViewModels
 
         private void RotateGrid90CCW()
         {
-            Pixels.Reset(MatrixUtil.RotateMatrix90CCW(Pixels.ToArray(), GridWidth, GridHeight));
+            Pixels.Reset(matrixOperationsService.RotateMatrix90CCW(Pixels.ToArray(), GridWidth, GridHeight));
             int w = gridWidth;
             int h = gridHeight;
             gridWidth = h;
@@ -979,7 +981,7 @@ namespace SpriteEditor.ViewModels
 
         private void RotateGrid180()
         {
-            Pixels.Reset(MatrixUtil.RotateMatrix180(Pixels.ToArray(), GridWidth, GridHeight));
+            Pixels.Reset(matrixOperationsService.RotateMatrix180(Pixels.ToArray(), GridWidth, GridHeight));
             AddHistoryState("Rotate Grid 180°");
             IsDirty = true;
         }
@@ -1001,7 +1003,7 @@ namespace SpriteEditor.ViewModels
 
         private void FlipGridVertically()
         {
-            Pixels.Reset(MatrixUtil.FlipMatrixVertically(Pixels.ToArray(), GridWidth, GridHeight));
+            Pixels.Reset(matrixOperationsService.FlipMatrixVertically(Pixels.ToArray(), GridWidth, GridHeight));
             AddHistoryState("Flip Grid Vertically");
             IsDirty = true;
         }
@@ -1023,7 +1025,7 @@ namespace SpriteEditor.ViewModels
 
         private void FlipGridHorizontally()
         {
-            Pixels.Reset(MatrixUtil.FlipMatrixHorizontally(Pixels.ToArray(), GridWidth, GridHeight));
+            Pixels.Reset(matrixOperationsService.FlipMatrixHorizontally(Pixels.ToArray(), GridWidth, GridHeight));
             AddHistoryState("Flip Grid Horizontally");
             IsDirty = true;
         }
@@ -1056,7 +1058,7 @@ namespace SpriteEditor.ViewModels
             int x = viewModel.PivotIndex % 3;
             int y = viewModel.PivotIndex / 3;
             Vector2Int normalizedPivot = new Vector2Int(x, y);
-            var newPixels = MatrixUtil.ResizeMatrix(Pixels.ToArray(), GridWidth, GridHeight, viewModel.GridWidth, viewModel.GridHeight, normalizedPivot);
+            var newPixels = matrixOperationsService.ResizeMatrix(Pixels.ToArray(), GridWidth, GridHeight, viewModel.GridWidth, viewModel.GridHeight, normalizedPivot);
             for (int i = 0; i < newPixels.Length; i++)
             {
                 if (newPixels[i] == null)

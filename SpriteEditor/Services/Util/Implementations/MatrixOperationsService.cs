@@ -1,10 +1,10 @@
 ﻿using DataModel.Math.Structures;
 
-namespace SpriteEditor.Util
+namespace SpriteEditor.Services.Util.Implementations
 {
-    internal static class MatrixUtil
+    internal sealed class MatrixOperationsService : IMatrixOperationsService
     {
-        public static T[] FlipMatrixHorizontally<T>(T[] matrix, int matrixWidth, int matrixHeight)
+        public T[] FlipMatrixHorizontally<T>(T[] matrix, int matrixWidth, int matrixHeight)
         {
             T[] dest = new T[matrixWidth * matrixHeight];
 
@@ -21,7 +21,7 @@ namespace SpriteEditor.Util
             return dest;
         }
 
-        public static T[] FlipMatrixVertically<T>(T[] matrix, int matrixWidth, int matrixHeight)
+        public T[] FlipMatrixVertically<T>(T[] matrix, int matrixWidth, int matrixHeight)
         {
             T[] dest = new T[matrixWidth * matrixHeight];
 
@@ -38,7 +38,7 @@ namespace SpriteEditor.Util
             return dest;
         }
 
-        public static T[] RotateMatrix180<T>(T[] matrix, int matrixWidth, int matrixHeight)
+        public T[] RotateMatrix180<T>(T[] matrix, int matrixWidth, int matrixHeight)
         {
             T[] dest = new T[matrixWidth * matrixHeight];
 
@@ -55,7 +55,7 @@ namespace SpriteEditor.Util
             return dest;
         }
 
-        public static T[] RotateMatrix90CW<T>(T[] matrix, int matrixWidth, int matrixHeight)
+        public T[] RotateMatrix90CW<T>(T[] matrix, int matrixWidth, int matrixHeight)
         {
             T[] dest = new T[matrixWidth * matrixHeight];
             for (int i = 0; i < matrix.Length; i++)
@@ -72,7 +72,7 @@ namespace SpriteEditor.Util
             return dest;
         }
 
-        public static T[] RotateMatrix90CCW<T>(T[] matrix, int matrixWidth, int matrixHeight)
+        public T[] RotateMatrix90CCW<T>(T[] matrix, int matrixWidth, int matrixHeight)
         {
             T[] dest = new T[matrixWidth * matrixHeight];
             for (int i = 0; i < matrix.Length; i++)
@@ -89,7 +89,7 @@ namespace SpriteEditor.Util
             return dest;
         }
 
-        public static T[] ResizeMatrix<T>(T[] matrix, int matrixWidth, int matrixHeight, int newWidth, int newHeight, Vector2Int normalizedPivot)
+        public T[] ResizeMatrix<T>(T[] matrix, int matrixWidth, int matrixHeight, int newWidth, int newHeight, Vector2Int normalizedPivot)
         {
             T[] dest = new T[newWidth * newHeight];
             int pivotX = 0;

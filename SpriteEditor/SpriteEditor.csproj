@@ -74,7 +74,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Commands\RelayCommand.cs" />
+    <Compile Include="Services\Commands\Implementations\RelayCommand.cs" />
     <Compile Include="DependencyInjection\Installers\ServiceInstaller.cs" />
     <Compile Include="DependencyInjection\Installers\ViewModelInstaller.cs" />
     <Compile Include="DependencyInjection\ServiceExtensions.cs" />
@@ -86,7 +86,8 @@
     <Compile Include="Services\Factories\Implementations\ViewFactory.cs" />
     <Compile Include="Services\Factories\IViewFactory.cs" />
     <Compile Include="Services\IService.cs" />
-    <Compile Include="Util\MatrixUtil.cs" />
+    <Compile Include="Services\Util\IMatrixOperationsService.cs" />
+    <Compile Include="Services\Util\Implementations\MatrixOperationsService.cs" />
     <Compile Include="ViewModels\IScaleCanvasViewModel.cs" />
     <Compile Include="ViewModels\ISpriteEditorViewModel.cs" />
     <Compile Include="ViewModels\IViewModel.cs" />
