@@ -18,7 +18,7 @@ namespace DependencyInjection.Windsor
         }
 
         public object Resolve(Type type)
-        {
+        {            
             return kernel.Resolve(type);
         }
 

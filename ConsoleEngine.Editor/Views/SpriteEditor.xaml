@@ -1,0 +1,234 @@
+﻿<Window x:Class="ConsoleEngine.Editor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"   
+        xmlns:models="clr-namespace:ConsoleEngine.Editor.Model" 
+        xmlns:views="clr-namespace:ConsoleEngine.Editor.Views"
+        mc:Ignorable="d"
+        Title="Sprite Editor" Height="600" Width="1000" Name="SpriteEditor" KeyDown="SpriteEditor_KeyDown">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Command="{Binding NewSpriteCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="/Views/NewFile_16x.png"></Image>
+                    </MenuItem.Icon>
+                    <MenuItem.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="New"/>
+                            <Label Grid.Column="1" Content="Ctrl+N"/>
+                        </Grid>
+                    </MenuItem.Header>
+                </MenuItem>
+                <MenuItem Command="{Binding OpenSpriteCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="/Views/OpenFolder_16x.png"></Image>
+                    </MenuItem.Icon>
+                    <MenuItem.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Open..."/>
+                            <Label Grid.Column="1" Content="Ctrl+O"/>
+                        </Grid>
+                    </MenuItem.Header>
+                </MenuItem>
+                <Separator/>
+				<MenuItem Command="{Binding SaveFileCommand}" IsEnabled="{Binding CanSave}">
+                    <MenuItem.Icon>
+                        <Image Source="/Views/Save_16x.png"></Image>
+                    </MenuItem.Icon>
+                    <MenuItem.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Save"/>
+                            <Label Grid.Column="1" Content="Ctrl+S"/>
+                        </Grid>
+                    </MenuItem.Header>
+                </MenuItem>
+				<MenuItem Command="{Binding SaveFileWithLocationCommand}" IsEnabled="{Binding IsDirty}">
+                    <MenuItem.Icon>
+						<Image Source="/Views/Save_16x.png"></Image>
+                    </MenuItem.Icon>
+                    <MenuItem.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Save As..."/>
+                            <Label Grid.Column="1" Content="Ctrl+Shift+S"/>
+                        </Grid>
+                    </MenuItem.Header>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Recent Files" IsEnabled="{Binding CanBrowseRecents}">
+                    <ListBox ItemsSource="{Binding RecentFiles}" Background="#00000000">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+									<Hyperlink TextDecorations="None" Background="#00000000" Command="{Binding Path=DataContext.OpenWithLocationCommand, ElementName=SpriteEditor}" CommandParameter="{Binding}" Click="Hyperlink_Click">
+										<TextBlock Text="{Binding}"/>
+									</Hyperlink>	
+								</TextBlock>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Command="{Binding QuitApplicationCommand}">
+                    <MenuItem.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Label Grid.Column="0" Content="Exit"/>
+                            <Label Grid.Column="1" Content="Alt+F4"/>
+                        </Grid>
+                    </MenuItem.Header>
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="_Edit">
+				<MenuItem Command="{Binding UndoCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="/Views/Undo_16x.png"></Image>
+                    </MenuItem.Icon>
+                    <MenuItem.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Grid.Column="0" Margin="0,0,10,0" Content="Undo"/>
+                                <Label Grid.Column="1" Margin="0,0,10,0" Content="{Binding UndoAction}"/>
+                            </StackPanel>
+                            <Label Grid.Column="1" Content="Ctrl+Z"/>
+                        </Grid>
+                    </MenuItem.Header>
+                </MenuItem>
+				<MenuItem Command="{Binding RedoCommand}">
+                    <MenuItem.Icon>
+                        <Image Source="/Views/Redo_16x.png"></Image>
+                    </MenuItem.Icon>
+                    <MenuItem.Header>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal">
+                                <Label Grid.Column="0" Margin="0,0,10,0" Content="Redo"/>
+                                <Label Grid.Column="1" Margin="0,0,10,0" Content="{Binding RedoAction}"/>
+                            </StackPanel>
+                            <Label Grid.Column="1" Content="Ctrl+Y"/>
+                        </Grid>
+                    </MenuItem.Header>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="_Grid Size..." Command="{Binding OpenCanvasDialogCommand}"/>
+                <MenuItem Header="_Transform">
+                    <MenuItem Header="_Rotate 180°" Command="{Binding RotateGrid180Command}"/>
+                    <MenuItem Header="_Rotate 90° Clockwise" Command="{Binding RotateGrid90CWCommand}"/>
+                    <MenuItem Header="_Rotate 90° Counter Clockwise" Command="{Binding RotateGrid90CCWCommand}"/>
+                    <Separator/>
+                    <MenuItem Header="_Flip Horizontal" Command="{Binding FlipGridHorizontallyCommand}"/>
+                    <MenuItem Header="_Flip Vertical" Command="{Binding FlipGridVerticallyCommand}"/>
+                </MenuItem>
+            </MenuItem>
+        </Menu>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="125"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <GroupBox Header="Characters">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20"/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <CheckBox Content="Paint Characters" IsChecked="{Binding CanPaintCharacters, Mode=TwoWay}"></CheckBox>
+                    <ListBox IsEnabled="{Binding CanPaintCharacters}" Grid.Row="1" ItemsSource="{Binding CharacterList}" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectedIndex="{Binding SelectedCharacterIndex, Mode=TwoWay}" Cursor="Hand">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <UniformGrid Columns="3" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <ListBoxItem Background="LightGray" IsHitTestVisible="False" Width="20" Height="20" Content="{Binding}"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="5,0,0,0"/>
+                                <Setter Property="Margin" Value="0"/>
+                                <Setter Property="Width" Value="30"/>
+                                <Setter Property="Height" Value="30"/>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                    </ListBox>
+                </Grid>
+            </GroupBox>
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="25"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid Grid.Row="0">
+                    <GroupBox Header="Color Palette">
+                        <ListBox ItemsSource="{Binding ColorList}" SelectedIndex="{Binding SelectedColorIndex, Mode=TwoWay}" Cursor="Hand">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Rows="1" HorizontalAlignment="Left"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type models:ColorEntry}">
+                                    <ListBoxItem Background="{Binding MediaColor}" IsHitTestVisible="False" Width="20" Height="20"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="5,0,0,0"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                    <Setter Property="Width" Value="30"/>
+                                    <Setter Property="Height" Value="30"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                    </GroupBox>
+                </Grid>
+                <DockPanel Grid.Row="1">
+                    <CheckBox Content="Show Grid" Margin="5,5,5,5" IsChecked="{Binding ShowGrid}"></CheckBox>
+                    <Button Width="40" Margin="5,5,5,5" FontSize="9" Content="Fill" Command="{Binding Path=FillCommand}"/>
+                    <Button Width="40" Margin="2,5,5,5" FontSize="9" Content="Clear" Command="{Binding Path=ClearCommand}"/>
+                    <CheckBox Content="Is Transparent" Margin="5,5,0,5" IsChecked="{Binding SupportsTransparency}"></CheckBox>
+                    <Button DockPanel.Dock="Right" Content="Import" Margin="5,5,5,5" FontSize="9" Width="50" Command="{Binding Path=ImportArtCommand}"></Button>
+                    <TextBox DockPanel.Dock="Right" HorizontalAlignment="Right" MaxLines="1" Width="200" Margin="0,5,0,5" Text="{Binding ImportedArt, Mode=TwoWay}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True"/>
+                    <Label HorizontalAlignment="Right" DockPanel.Dock="Right" Content="ASCII Art" Margin="5,0,0,0"/>
+                </DockPanel>
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                    <views:SpriteGridView/>
+                </ScrollViewer>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

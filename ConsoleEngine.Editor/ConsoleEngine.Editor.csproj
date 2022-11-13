@@ -1,0 +1,79 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\NewFile_16x.png" />
+    <None Remove="Resources\OpenFolder_16x.png" />
+    <None Remove="Resources\Redo_16x.png" />
+    <None Remove="Resources\Save_16x.png" />
+    <None Remove="Resources\Undo_16x.png" />
+    <None Remove="Views\NewFile_16x.png" />
+    <None Remove="Views\OpenFolder_16x.png" />
+    <None Remove="Views\Redo_16x.png" />
+    <None Remove="Views\Save_16x.png" />
+    <None Remove="Views\Undo_16x.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DataModel\DataModel.csproj" />
+    <ProjectReference Include="..\DependencyInjection.Windsor\DependencyInjection.Windsor.csproj" />
+    <ProjectReference Include="..\DependencyInjection\DependencyInjection.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\NewFile_16x.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\OpenFolder_16x.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Redo_16x.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Save_16x.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Undo_16x.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Views\NewFile_16x.png" />
+    <Resource Include="Views\OpenFolder_16x.png" />
+    <Resource Include="Views\Redo_16x.png" />
+    <Resource Include="Views\Save_16x.png" />
+    <Resource Include="Views\Undo_16x.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Services\Commands\Implementations\" />
+    <Folder Include="Services\History\Implementations\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Castle.Core" Version="4.0.0" />
+    <PackageReference Include="Castle.Windsor" Version="4.0.0" />
+    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+</Project>
