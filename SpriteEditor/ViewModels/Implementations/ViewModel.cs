@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace SpriteEditor.ViewModels
+namespace SpriteEditor.ViewModels.Implementations
 {
     internal abstract class ViewModel : IViewModel, INotifyPropertyChanged
     {
@@ -27,6 +27,6 @@ namespace SpriteEditor.ViewModels
             OnPropertyChanged(propertyName);
 
             return true;
-        }
+        }        
     }
 }

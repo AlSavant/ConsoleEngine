@@ -17,8 +17,9 @@ using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using SpriteEditor.Services.SpriteGrid;
 
-namespace SpriteEditor.ViewModels
+namespace SpriteEditor.ViewModels.Implementations
 {
     internal sealed class SpriteEditorViewModel : ViewModel, ISpriteEditorViewModel
     {
@@ -76,20 +77,21 @@ namespace SpriteEditor.ViewModels
                 }
             }
         }
-
-        private bool showGrid = true;
+       
         public bool ShowGrid
         {
             get
             {
-                return showGrid;
+                return spriteGridStateService.CanShowGrid();
             }
             set
             {
-                if (SetProperty(ref showGrid, value, nameof(ShowGrid)))
+                if(value != spriteGridStateService.CanShowGrid())
                 {
+                    spriteGridStateService.SetGridVisibility(value);
+                    OnPropertyChanged(nameof(ShowGrid));
                     OnPropertyChanged(nameof(GridColor));
-                }
+                }                
             }
         }
 
@@ -227,11 +229,16 @@ namespace SpriteEditor.ViewModels
 
         private readonly IViewFactory viewFactory;
         private readonly IMatrixOperationsService matrixOperationsService;
+        private readonly ISpriteGridStateService spriteGridStateService;
 
-        public SpriteEditorViewModel(IViewFactory viewFactory, IMatrixOperationsService matrixOperationsService)
+        public SpriteEditorViewModel(
+            IViewFactory viewFactory, 
+            IMatrixOperationsService matrixOperationsService,
+            ISpriteGridStateService spriteGridStateService)
         {
-            this.viewFactory = viewFactory;            
+            this.viewFactory = viewFactory;
             this.matrixOperationsService = matrixOperationsService;
+            this.spriteGridStateService = spriteGridStateService;
             Setup();
         }
 

@@ -3,7 +3,7 @@ using SpriteEditor.Models;
 using System.Windows;
 using System.Windows.Input;
 
-namespace SpriteEditor.ViewModels
+namespace SpriteEditor.ViewModels.Implementations
 {
     internal sealed class ScaleCanvasViewModel : ViewModel, IScaleCanvasViewModel
     {

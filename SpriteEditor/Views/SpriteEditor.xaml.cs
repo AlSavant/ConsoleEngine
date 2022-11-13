@@ -1,4 +1,5 @@
 ﻿using SpriteEditor.ViewModels;
+using SpriteEditor.ViewModels.Implementations;
 using SpriteEditor.Views;
 using System.Windows;
 using System.Windows.Controls;

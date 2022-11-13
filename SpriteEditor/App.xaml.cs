@@ -37,13 +37,21 @@ namespace SpriteEditor
                 if (view == null)
                     continue;
                 InjectView(view);
-                foreach(var controlView in FindVisualChilds<UserControl>(window))
-                {
-                    view = controlView as IView;
-                    if (view == null)
-                        continue;                    
-                    InjectView(view);
-                }
+                window.Loaded -= OnWindowLoaded;
+                window.Loaded += OnWindowLoaded;                
+            }
+        }
+
+        private void OnWindowLoaded(object sender, RoutedEventArgs args)
+        {
+            var window = (Window)sender;
+            window.Loaded -= OnWindowLoaded;
+            foreach (var controlView in FindVisualChilds<UserControl>(window))
+            {
+                var view = controlView as IView;
+                if (view == null)
+                    continue;
+                InjectView(view);
             }
         }
 

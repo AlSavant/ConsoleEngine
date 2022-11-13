@@ -1,4 +1,5 @@
 ﻿using SpriteEditor.Models;
+using SpriteEditor.ViewModels.Implementations;
 
 namespace SpriteEditor.ViewModels
 {
