@@ -233,36 +233,17 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
         private readonly IViewFactory viewFactory;
         private readonly IMatrixOperationsService matrixOperationsService;
         private readonly ISpriteGridStateService spriteGridStateService;
-        private readonly ICanvasDrawingService canvasDrawingService;
-        private readonly IHistoryActionService historyActionService;
 
         public SpriteEditorViewModel(
             IViewFactory viewFactory,
-            ICanvasDrawingService canvasDrawingService,
             IMatrixOperationsService matrixOperationsService,
             ISpriteGridStateService spriteGridStateService)
         {
             this.viewFactory = viewFactory;
-            this.canvasDrawingService = canvasDrawingService;
             this.matrixOperationsService = matrixOperationsService;
             this.spriteGridStateService = spriteGridStateService;
-            canvasDrawingService.PropertyChanged -= OnPixelsChangedEvent;
-            canvasDrawingService.PropertyChanged += OnPixelsChangedEvent;
             Setup();
-        }
-
-        private void OnPixelsChangedEvent(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
-        {
-            if (args.PropertyName != "Pixels")
-                return;
-            var pixels = (CanvasPixelsChangedEventArgs)args;
-            foreach(var index in pixels.ChangedIndices)
-            {
-                Pixels[index].Character = canvasDrawingService.Get(index).character;
-                Pixels[index].Color = canvasDrawingService.Get(index).colorEntry;
-            }
-            
-        }
+        }       
 
         private Dictionary<char, byte> charLookup;
 
@@ -455,9 +436,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (selectPixelCommand == null)
                 {
-                    selectPixelCommand = new RelayCommand<PixelEntry>(
-                        param => SelectPixel(param)
-                    );
+                    selectPixelCommand = new RelayCommand<PixelEntry>(SelectPixel);
                 }
                 return selectPixelCommand;
             }
@@ -497,9 +476,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (fillCommand == null)
                 {
-                    fillCommand = new RelayCommand(
-                        () => Fill()
-                    );
+                    fillCommand = new RelayCommand(Fill);                        
                 }
                 return fillCommand;
             }
@@ -540,9 +517,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (clearCommand == null)
                 {
-                    clearCommand = new RelayCommand(
-                        () => Clear()
-                    );
+                    clearCommand = new RelayCommand(Clear);                        
                 }
                 return clearCommand;
             }
@@ -583,9 +558,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (importArtCommand == null)
                 {
-                    importArtCommand = new RelayCommand(
-                        () => ImportArt()
-                    );
+                    importArtCommand = new RelayCommand(ImportArt);                        
                 }
                 return importArtCommand;
             }
@@ -595,7 +568,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
         {
             get
             {
-                var e = Encoding.GetEncoding("437");
+                var e = CodePagesEncodingProvider.Instance.GetEncoding(437);
                 var s = e.GetString(new byte[] { 32 });
                 return s[0];
             }
@@ -646,9 +619,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (saveFileWithLocationCommand == null)
                 {
-                    saveFileWithLocationCommand = new RelayCommand(
-                        () => SaveFileWithLocation()
-                    );
+                    saveFileWithLocationCommand = new RelayCommand(SaveFileWithLocation);
                 }
                 return saveFileWithLocationCommand;
             }
@@ -706,9 +677,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (saveFileCommand == null)
                 {
-                    saveFileCommand = new RelayCommand(
-                        () => SaveFile()
-                    );
+                    saveFileCommand = new RelayCommand(SaveFile);
                 }
                 return saveFileCommand;
             }
@@ -744,9 +713,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (newSpriteCommand == null)
                 {
-                    newSpriteCommand = new RelayCommand(
-                        () => NewSprite()
-                    );
+                    newSpriteCommand = new RelayCommand(NewSprite);                    
                 }
                 return newSpriteCommand;
             }
@@ -777,9 +744,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (openWithLocationCommand == null)
                 {
-                    openWithLocationCommand = new RelayCommand<string>(
-                        (path) => OpenFileWithLocation(path)
-                    );
+                    openWithLocationCommand = new RelayCommand<string>(OpenFileWithLocation);
                 }
                 return openWithLocationCommand;
             }
@@ -831,9 +796,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (openSpriteCommand == null)
                 {
-                    openSpriteCommand = new RelayCommand(
-                        () => OpenSprite()
-                    );
+                    openSpriteCommand = new RelayCommand(OpenSprite);
                 }
                 return openSpriteCommand;
             }
@@ -906,7 +869,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             for (int i = 0; i < gridWidth * gridHeight; i++)
             {
                 pixels.Add(new PixelEntry());
-                var e = Encoding.GetEncoding("437");
+                var e = CodePagesEncodingProvider.Instance.GetEncoding(437);
                 var s = e.GetString(new byte[] { sprite.characters[i] });
                 pixels[i].Character = s[0];
                 pixels[i].Color = ColorEntry.FromConsoleColor((ConsoleColor)sprite.colors[i]);
@@ -933,9 +896,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (quitApplicationCommand == null)
                 {
-                    quitApplicationCommand = new RelayCommand(
-                        () => QuitApplication()
-                    );
+                    quitApplicationCommand = new RelayCommand(QuitApplication);
                 }
                 return quitApplicationCommand;
             }
@@ -948,9 +909,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (rotateGrid90CWCommand == null)
                 {
-                    rotateGrid90CWCommand = new RelayCommand(
-                        () => RotateGrid90CW()
-                    );
+                    rotateGrid90CWCommand = new RelayCommand(RotateGrid90CW);
                 }
                 return rotateGrid90CWCommand;
             }
@@ -977,9 +936,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (rotateGrid90CCWCommand == null)
                 {
-                    rotateGrid90CCWCommand = new RelayCommand(
-                        () => RotateGrid90CCW()
-                    );
+                    rotateGrid90CCWCommand = new RelayCommand(RotateGrid90CCW);                    
                 }
                 return rotateGrid90CCWCommand;
             }
@@ -1006,9 +963,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (rotateGrid180Command == null)
                 {
-                    rotateGrid180Command = new RelayCommand(
-                        () => RotateGrid180()
-                    );
+                    rotateGrid180Command = new RelayCommand(RotateGrid180);
                 }
                 return rotateGrid180Command;
             }
@@ -1028,9 +983,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (flipGridVerticallyCommand == null)
                 {
-                    flipGridVerticallyCommand = new RelayCommand(
-                        () => FlipGridVertically()
-                    );
+                    flipGridVerticallyCommand = new RelayCommand(FlipGridVertically);
                 }
                 return flipGridVerticallyCommand;
             }
@@ -1050,9 +1003,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (flipGridHorizontallyCommand == null)
                 {
-                    flipGridHorizontallyCommand = new RelayCommand(
-                        () => FlipGridHorizontally()
-                    );
+                    flipGridHorizontallyCommand = new RelayCommand(FlipGridHorizontally);                    
                 }
                 return flipGridHorizontallyCommand;
             }
@@ -1072,9 +1023,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 if (openCanvasDialogCommand == null)
                 {
-                    openCanvasDialogCommand = new RelayCommand(
-                        () => OpenCanvasDialog()
-                    );
+                    openCanvasDialogCommand = new RelayCommand(OpenCanvasDialog);
                 }
                 return openCanvasDialogCommand;
             }

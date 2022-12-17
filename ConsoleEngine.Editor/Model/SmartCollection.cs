@@ -34,6 +34,18 @@ namespace ConsoleEngine.Editor.Model
             this.OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
+        public void TrimEnd(int count)
+        {
+            for(int i  = 0; i < count; i++)
+            {
+                if (Items.Count == 0)
+                    return;
+                Items.RemoveAt(Items.Count - 1);
+            }
+            this.OnPropertyChanged(new PropertyChangedEventArgs(nameof(Count)));
+            this.OnPropertyChanged(new PropertyChangedEventArgs("Item[]"));
+        }
+
         public void Reset(IEnumerable<T> range)
         {
             this.Items.Clear();
