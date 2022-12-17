@@ -1,8 +1,11 @@
 ﻿using ConsoleEngine.Editor.Model;
+using ConsoleEngine.Editor.Model.ComponentModel.Implementations;
 using ConsoleEngine.Editor.Services.Factories;
+using ConsoleEngine.Editor.Services.History;
 using ConsoleEngine.Editor.Services.SpriteGrid;
 using ConsoleEngine.Editor.Services.Util;
 using ConsoleEngine.Editor.Views;
+using DataModel.ComponentModel;
 using DataModel.Math.Structures;
 using DataModel.Rendering;
 using GalaSoft.MvvmLight.CommandWpf;
@@ -230,16 +233,35 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
         private readonly IViewFactory viewFactory;
         private readonly IMatrixOperationsService matrixOperationsService;
         private readonly ISpriteGridStateService spriteGridStateService;
+        private readonly ICanvasDrawingService canvasDrawingService;
+        private readonly IHistoryActionService historyActionService;
 
         public SpriteEditorViewModel(
             IViewFactory viewFactory,
+            ICanvasDrawingService canvasDrawingService,
             IMatrixOperationsService matrixOperationsService,
             ISpriteGridStateService spriteGridStateService)
         {
             this.viewFactory = viewFactory;
+            this.canvasDrawingService = canvasDrawingService;
             this.matrixOperationsService = matrixOperationsService;
             this.spriteGridStateService = spriteGridStateService;
+            canvasDrawingService.PropertyChanged -= OnPixelsChangedEvent;
+            canvasDrawingService.PropertyChanged += OnPixelsChangedEvent;
             Setup();
+        }
+
+        private void OnPixelsChangedEvent(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
+        {
+            if (args.PropertyName != "Pixels")
+                return;
+            var pixels = (CanvasPixelsChangedEventArgs)args;
+            foreach(var index in pixels.ChangedIndices)
+            {
+                Pixels[index].Character = canvasDrawingService.Get(index).character;
+                Pixels[index].Color = canvasDrawingService.Get(index).colorEntry;
+            }
+            
         }
 
         private Dictionary<char, byte> charLookup;

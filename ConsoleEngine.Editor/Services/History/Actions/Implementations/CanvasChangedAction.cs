@@ -19,7 +19,17 @@ namespace ConsoleEngine.Editor.Services.History.Actions.Implementations
             this.state = state;
         }
 
-        public void Reset()
+        public HistoryState? GetState()
+        {
+            return state;
+        }
+
+        public void Redo()
+        {
+
+        }
+
+        public void Undo()
         {
 
         }

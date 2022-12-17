@@ -1,8 +1,9 @@
-﻿using DataModel.Math.Structures;
+﻿using DataModel.ComponentModel;
+using DataModel.Math.Structures;
 
 namespace ConsoleEngine.Editor.Services.SpriteGrid
 {
-    internal interface ISpriteGridStateService : IService
+    internal interface ISpriteGridStateService : IService, INotifyPropertyChanged
     {
         Vector2Int GetGridSize();
         int GetGridWidth();

@@ -12,7 +12,7 @@ namespace ConsoleEngine.Editor.Services.Factories.Implementations
             this.serviceProvider = serviceProvider;
         }
 
-        public T CreateInstance<T>() where T : IHistoryAction, new()
+        public T CreateInstance<T>() where T : IHistoryAction
         {
             return serviceProvider.Resolve<T>();
         }
