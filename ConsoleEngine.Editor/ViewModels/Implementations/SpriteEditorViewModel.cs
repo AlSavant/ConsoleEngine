@@ -1,5 +1,7 @@
 ﻿using ConsoleEngine.Editor.Model;
 using ConsoleEngine.Editor.Model.ComponentModel.Implementations;
+using ConsoleEngine.Editor.Services.Commands;
+using ConsoleEngine.Editor.Services.Encoding;
 using ConsoleEngine.Editor.Services.Factories;
 using ConsoleEngine.Editor.Services.History;
 using ConsoleEngine.Editor.Services.SpriteGrid;
@@ -25,149 +27,7 @@ using System.Windows.Media;
 namespace ConsoleEngine.Editor.ViewModels.Implementations
 {
     internal sealed class SpriteEditorViewModel : ViewModel, ISpriteEditorViewModel
-    {
-        public ObservableCollection<char> CharacterList { get; set; }
-        public ObservableCollection<ColorEntry> ColorList { get; set; }
-
-        private int gridWidth = 20;
-        public int GridWidth
-        {
-            get
-            {
-                return gridWidth;
-            }
-            set
-            {
-                if (SetProperty(ref gridWidth, value, nameof(GridWidth)))
-                {
-                    OnPropertyChanged(nameof(PixelWidth));
-                }
-            }
-        }
-        private int gridHeight = 20;
-        public int GridHeight
-        {
-            get
-            {
-                return gridHeight;
-            }
-            set
-            {
-                SetProperty(ref gridHeight, value, nameof(GridHeight));
-            }
-        }
-
-        public int PixelWidth
-        {
-            get
-            {
-                return GridWidth * 20;
-            }
-        }
-
-        private bool supportsTransparency;
-        public bool SupportsTransparency
-        {
-            get
-            {
-                return supportsTransparency;
-            }
-            set
-            {
-                if (SetProperty(ref supportsTransparency, value, nameof(SupportsTransparency)))
-                {
-                    IsDirty = true;
-                }
-            }
-        }
-
-        public bool ShowGrid
-        {
-            get
-            {
-                return spriteGridStateService.CanShowGrid();
-            }
-            set
-            {
-                if (value != spriteGridStateService.CanShowGrid())
-                {
-                    spriteGridStateService.SetGridVisibility(value);
-                    OnPropertyChanged(nameof(ShowGrid));
-                    OnPropertyChanged(nameof(GridColor));
-                }
-            }
-        }
-
-        public SolidColorBrush GridColor
-        {
-            get
-            {
-                return ShowGrid ? new SolidColorBrush(Colors.White) : new SolidColorBrush(Colors.Black);
-            }
-        }
-
-        private int selectedCharacterIndex = 0;
-        public int SelectedCharacterIndex
-        {
-            get
-            {
-                return selectedCharacterIndex;
-            }
-            set
-            {
-                if (SetProperty(ref selectedCharacterIndex, value, nameof(SelectedCharacterIndex)))
-                {
-                    SelectedCharacter = CharacterList[value];
-                }
-            }
-        }
-
-        private char SelectedCharacter { get; set; }
-
-        private int selectedColorIndex = 0;
-        public int SelectedColorIndex
-        {
-            get
-            {
-                return selectedColorIndex;
-            }
-            set
-            {
-                if (SetProperty(ref selectedColorIndex, value, nameof(SelectedColorIndex)))
-                {
-                    SelectedColor = ColorList[value];
-
-                }
-            }
-        }
-        private ColorEntry SelectedColor { get; set; }
-
-        private string importedArt;
-        public string ImportedArt
-        {
-            get
-            {
-                return importedArt;
-            }
-            set
-            {
-                SetProperty(ref importedArt, value, nameof(ImportedArt));
-            }
-        }
-
-        private bool canPaintCharacters = true;
-        public bool CanPaintCharacters
-        {
-            get
-            {
-                return canPaintCharacters;
-            }
-            set
-            {
-                SetProperty(ref canPaintCharacters, value, nameof(CanPaintCharacters));
-            }
-        }
-
+    {        
         public bool CanSave
         {
             get
@@ -227,31 +87,49 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 return RecentFiles.Count > 0;
             }
-        }
-        public SmartCollection<PixelEntry> Pixels { get; set; }
+        }        
 
         private readonly IViewFactory viewFactory;
         private readonly IMatrixOperationsService matrixOperationsService;
         private readonly ISpriteGridStateService spriteGridStateService;
+        private readonly ICharToOEM437ConverterService charToOEM437ConverterService;
+        private readonly IHistoryActionService historyActionService;
+
+        public ICommand UndoCommand { get; private set; }
+        public ICommand RedoCommand { get; private set; }
 
         public SpriteEditorViewModel(
+            IUndoActionCommand undoActionCommand,
+            IRedoActionCommand redoActionCommand,
+            IHistoryActionService historyActionService,
+            ICharToOEM437ConverterService charToOEM437ConverterService,
             IViewFactory viewFactory,
             IMatrixOperationsService matrixOperationsService,
             ISpriteGridStateService spriteGridStateService)
         {
+            this.historyActionService = historyActionService;
+            this.charToOEM437ConverterService = charToOEM437ConverterService;
             this.viewFactory = viewFactory;
             this.matrixOperationsService = matrixOperationsService;
             this.spriteGridStateService = spriteGridStateService;
+            historyActionService.SetMaxActionBuffer(10);
+            UndoCommand = undoActionCommand;
+            RedoCommand = redoActionCommand;
             Setup();
         }       
 
-        private Dictionary<char, byte> charLookup;
+        private void OnHistoryActionChanged(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
+        {
+            OnPropertyChanged(nameof(UndoAction));
+            OnPropertyChanged(nameof(RedoAction));            
+            CommandManager.InvalidateRequerySuggested();
+        }
 
         public string UndoAction
         {
             get
             {
-                return History.UndoAction;
+                return historyActionService.UndoActionName;
             }
         }
 
@@ -259,50 +137,13 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
         {
             get
             {
-                return History.RedoAction;
+                return historyActionService.RedoActionName;
             }
-        }
-
-        private HistoryService History { get; set; }
+        }        
 
         public void Setup()
-        {
-            CharacterList = new ObservableCollection<char>();
-            charLookup = new Dictionary<char, byte>();
-            var encoding = CodePagesEncodingProvider.Instance.GetEncoding(437);
-            if(encoding != null)
-            {
-                var space = encoding.GetString(new byte[] { 32 });
-                CharacterList.Add(space[0]);
-                charLookup.Add(space[0], 32);
-                for (byte i = 0; i < 255; i++)
-                {
-                    char c = (char)i;
-                    if (char.IsControl(c))
-                        continue;
-                    if (char.IsWhiteSpace(c))
-                        continue;
-                    var s = encoding.GetString(new byte[] { i });
-                    charLookup.Add(s[0], i);
-                    CharacterList.Add(s[0]);
-                }
-            }                        
-            ColorList = new ObservableCollection<ColorEntry>();
-            var consoleColors = (ConsoleColor[])Enum.GetValues(typeof(ConsoleColor));
-            for (int i = 0; i < consoleColors.Length; i++)
-            {
-                var entry = ColorEntry.FromConsoleColor(consoleColors[i]);
-                ColorList.Add(entry);
-            }
-            var last = ColorList[ColorList.Count - 1];
-            ColorList[ColorList.Count - 1] = ColorList[0];
-            ColorList[0] = last;
-            SelectedCharacter = CharacterList[0];
-            SelectedColor = ColorList[0];
-            Pixels = new SmartCollection<PixelEntry>();
-            OnGridResized();
-            History = new HistoryService(3);
-            AddHistoryState("");
+        {                        
+            OnGridResized();            
             RecentFiles = new ObservableCollection<string>();
             if (Properties.Settings.Default.RecentFiles == null)
             {
@@ -323,54 +164,13 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             OnPropertyChanged(nameof(CanBrowseRecents));
             IsDirty = false;
         }
-
-        private void AddHistoryState(string actionName)
-        {
-            if (History == null)
-                return;
-            History.AddState(new State(actionName, GridWidth, GridHeight, Pixels));
-            OnPropertyChanged(nameof(UndoAction));
-            OnPropertyChanged(nameof(RedoAction));            
-            CommandManager.InvalidateRequerySuggested();
-        }
-
-        private ICommand undoCommand;
-        public ICommand UndoCommand
-        {
-            get
-            {
-                if (undoCommand == null)
-                {
-                    undoCommand = new RelayCommand<object>(
-                        (x) => Undo(), (x) => CanUndo
-                    );
-                }
-                return undoCommand;
-            }
-        }        
-
-        private ICommand redoCommand;
-        public ICommand RedoCommand
-        {
-            get
-            {
-                if (redoCommand == null)
-                {
-                    redoCommand = new RelayCommand<object>(
-                        (x) => Redo(), (x) => CanRedo
-                    );
-                }
-                return redoCommand;
-            }
-        }
+        
 
         public bool CanUndo
         {
             get
             {
-                if (History == null)
-                    return false;
-                return History.CanUndo;
+                return historyActionService.CanUndo;
             }
         }
 
@@ -378,178 +178,22 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
         {
             get
             {
-                if (History == null)
-                    return false;
-                return History.CanRedo;
+                return historyActionService.CanRedo;
+
             }
-        }
-
-        public void Undo()
-        {
-            if (!History.CanUndo)
-                return;
-            var state = History.GetPreviousState();
-            ApplyState(state);
-            OnPropertyChanged(nameof(UndoAction));
-            OnPropertyChanged(nameof(RedoAction));            
-            CommandManager.InvalidateRequerySuggested();
-        }
-
-        public void Redo()
-        {
-            if (!History.CanRedo)
-                return;
-            var state = History.GetNextState();
-            ApplyState(state);
-            OnPropertyChanged(nameof(UndoAction));
-            OnPropertyChanged(nameof(RedoAction));            
-            CommandManager.InvalidateRequerySuggested();
-        }
-
-        private void ApplyState(State state)
-        {
-            gridWidth = state.GridWidth;
-            gridHeight = state.GridHeight;
-            Pixels.Reset(state.GetGridClone());
-            OnPropertyChanged(nameof(GridHeight));
-            OnPropertyChanged(nameof(GridWidth));
-            OnPropertyChanged(nameof(PixelWidth));
-            OnPropertyChanged(nameof(Pixels));
-        }
+        }               
 
         private void OnGridResized()
         {
-            var pixels = new List<PixelEntry>(GridHeight * GridWidth);
+            /*var pixels = new List<PixelEntry>(GridHeight * GridWidth);
             for (int i = 0; i < GridHeight * GridWidth; i++)
             {
                 pixels.Add(PixelEntry.Default);
             }
             Pixels.Reset(pixels);
             AddHistoryState("Resize Grid");
-            IsDirty = true;
-        }
-
-        private ICommand selectPixelCommand;
-        public ICommand SelectPixelCommand
-        {
-            get
-            {
-                if (selectPixelCommand == null)
-                {
-                    selectPixelCommand = new RelayCommand<PixelEntry>(SelectPixel);
-                }
-                return selectPixelCommand;
-            }
-        }
-
-        private void SelectPixel(PixelEntry? pixel)
-        {
-            if (pixel == null)
-                return;
-            bool dirtyPixel = false;
-            if (CanPaintCharacters)
-            {
-                if (pixel.Character != SelectedCharacter)
-                {
-                    dirtyPixel = true;
-                    pixel.Character = SelectedCharacter;
-                }
-
-            }
-            if (pixel.Color != SelectedColor)
-            {
-                dirtyPixel = true;
-                pixel.Color = SelectedColor;
-            }
-            if (dirtyPixel)
-            {
-                AddHistoryState("Paint Pixel");
-                IsDirty = true;
-            }
-
-        }
-
-        private ICommand fillCommand;
-        public ICommand FillCommand
-        {
-            get
-            {
-                if (fillCommand == null)
-                {
-                    fillCommand = new RelayCommand(Fill);                        
-                }
-                return fillCommand;
-            }
-        }
-
-        private void Fill()
-        {
-            bool dirtyFill = false;
-            for (int i = 0; i < Pixels.Count; i++)
-            {
-                if (CanPaintCharacters)
-                {
-                    if (Pixels[i].Character != SelectedCharacter)
-                    {
-                        Pixels[i].Character = SelectedCharacter;
-                        dirtyFill = true;
-                    }
-                }
-                if (Pixels[i].Color != SelectedColor)
-                {
-                    dirtyFill = true;
-                    Pixels[i].Color = SelectedColor;
-                }
-
-            }
-            if (dirtyFill)
-            {
-                AddHistoryState("Fill");
-                IsDirty = true;
-            }
-
-        }
-
-        private ICommand clearCommand;
-        public ICommand ClearCommand
-        {
-            get
-            {
-                if (clearCommand == null)
-                {
-                    clearCommand = new RelayCommand(Clear);                        
-                }
-                return clearCommand;
-            }
-        }
-
-        private void Clear()
-        {
-            bool dirtyClear = false;
-            for (int i = 0; i < Pixels.Count; i++)
-            {
-                if (CanPaintCharacters)
-                {
-                    if (Pixels[i].Character != ' ')
-                    {
-                        dirtyClear = true;
-                        Pixels[i].Character = ' ';
-                    }
-                }
-                if (Pixels[i].Color.ConsoleColor != ConsoleColor.Black)
-                {
-                    dirtyClear = true;
-                    Pixels[i].Color = ColorEntry.FromConsoleColor(ConsoleColor.Black);
-                }
-
-            }
-            if (dirtyClear)
-            {
-                AddHistoryState("Clear");
-                IsDirty = true;
-            }
-
-        }
+            IsDirty = true;*/
+        }                    
 
         private ICommand importArtCommand;
         public ICommand ImportArtCommand
@@ -576,7 +220,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
 
         private void ImportArt()
         {
-            if (string.IsNullOrEmpty(ImportedArt))
+            /*if (string.IsNullOrEmpty(ImportedArt))
                 return;
             var lines = ImportedArt.Split('\n');
             GridHeight = lines.Length;
@@ -609,7 +253,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             OnPropertyChanged(nameof(GridWidth));
             OnPropertyChanged(nameof(PixelWidth));
             AddHistoryState("Import Art");
-            IsDirty = true;
+            IsDirty = true;*/
         }
 
         private ICommand saveFileWithLocationCommand;
@@ -685,7 +329,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
 
         private void SaveFile()
         {
-            var colors = new byte[GridWidth * GridHeight];
+            /*var colors = new byte[GridWidth * GridHeight];
             var characters = new byte[colors.Length];
             for (int i = 0; i < Pixels.Count; i++)
             {
@@ -696,14 +340,14 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                     continue;
                 }
                 colors[i] = (byte)Pixels[i].Color.ConsoleColor;
-                characters[i] = charLookup[Pixels[i].Character];
+                characters[i] = charToOEM437ConverterService.CharToByte(Pixels[i].Character);                
             }
-            var sprite = new Sprite(GridWidth, GridHeight, characters, colors, supportsTransparency);
+            var sprite = new Sprite(GridWidth, GridHeight, characters, colors, spriteGridStateService.SupportsTransparency());
             var formatter = new BinaryFormatter();
             var stream = new FileStream(SavePath, FileMode.Create, FileAccess.Write, FileShare.None);
             formatter.Serialize(stream, sprite);
             stream.Close();
-            IsDirty = false;
+            IsDirty = false;*/
         }
 
         private ICommand newSpriteCommand;
@@ -721,11 +365,11 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
 
         private void NewSprite()
         {
-            if (!DiscardChanges())
+            /*if (!DiscardChanges())
                 return;
             if (GridWidth == 20 && GridHeight == 20)
-            {
-                Clear();
+            {                
+                //Clear();
             }
             else
             {
@@ -733,8 +377,8 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                 gridHeight = 20;
                 OnGridResized();
             }
-            ShowGrid = true;
-            IsDirty = false;
+            spriteGridStateService.SetGridVisibility(true);            
+            IsDirty = false;*/
         }
 
         private ICommand openWithLocationCommand;
@@ -770,7 +414,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             stream.Close();
             ApplySprite(sprite);
             IsDirty = false;
-            ImportedArt = string.Empty;
+            //ImportedArt = string.Empty;
             SavePath = path;
 
             int idx = RecentFiles.IndexOf(path);
@@ -825,7 +469,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                 stream.Close();
                 ApplySprite(sprite);
                 IsDirty = false;
-                ImportedArt = string.Empty;
+                //ImportedArt = string.Empty;
                 SavePath = filePath;
 
                 if (!RecentFiles.Contains(SavePath))
@@ -863,7 +507,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
 
         private void ApplySprite(Sprite sprite)
         {
-            gridWidth = sprite.width;
+            /*gridWidth = sprite.width;
             gridHeight = sprite.height;
             var pixels = new List<PixelEntry>(gridWidth * gridHeight);
             for (int i = 0; i < gridWidth * gridHeight; i++)
@@ -875,10 +519,10 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                 pixels[i].Color = ColorEntry.FromConsoleColor((ConsoleColor)sprite.colors[i]);
             }
             Pixels.Reset(pixels);
-            SupportsTransparency = sprite.isTransparent;
+            spriteGridStateService.SetTransparencyMode(sprite.isTransparent);            
             OnPropertyChanged(nameof(GridHeight));
             OnPropertyChanged(nameof(GridWidth));
-            OnPropertyChanged(nameof(PixelWidth));
+            OnPropertyChanged(nameof(PixelWidth));*/
         }
 
         private bool DiscardChanges()
@@ -917,7 +561,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
 
         private void RotateGrid90CW()
         {
-            Pixels.Reset(matrixOperationsService.RotateMatrix90CW(Pixels.ToArray(), GridWidth, GridHeight));
+            /*Pixels.Reset(matrixOperationsService.RotateMatrix90CW(Pixels.ToArray(), GridWidth, GridHeight));
             int w = gridWidth;
             int h = gridHeight;
             gridWidth = h;
@@ -926,7 +570,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             OnPropertyChanged(nameof(GridWidth));
             OnPropertyChanged(nameof(PixelWidth));
             AddHistoryState("Rotate Grid 90° CW");
-            IsDirty = true;
+            IsDirty = true;*/
         }
 
         private ICommand rotateGrid90CCWCommand;
@@ -944,7 +588,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
 
         private void RotateGrid90CCW()
         {
-            Pixels.Reset(matrixOperationsService.RotateMatrix90CCW(Pixels.ToArray(), GridWidth, GridHeight));
+            /*Pixels.Reset(matrixOperationsService.RotateMatrix90CCW(Pixels.ToArray(), GridWidth, GridHeight));
             int w = gridWidth;
             int h = gridHeight;
             gridWidth = h;
@@ -953,7 +597,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             OnPropertyChanged(nameof(GridWidth));
             OnPropertyChanged(nameof(PixelWidth));
             AddHistoryState("Rotate Grid 90° CCW");
-            IsDirty = true;
+            IsDirty = true;*/
         }
 
         private ICommand rotateGrid180Command;
@@ -971,9 +615,9 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
 
         private void RotateGrid180()
         {
-            Pixels.Reset(matrixOperationsService.RotateMatrix180(Pixels.ToArray(), GridWidth, GridHeight));
+            /*Pixels.Reset(matrixOperationsService.RotateMatrix180(Pixels.ToArray(), GridWidth, GridHeight));
             AddHistoryState("Rotate Grid 180°");
-            IsDirty = true;
+            IsDirty = true;*/
         }
 
         private ICommand flipGridVerticallyCommand;
@@ -991,9 +635,9 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
 
         private void FlipGridVertically()
         {
-            Pixels.Reset(matrixOperationsService.FlipMatrixVertically(Pixels.ToArray(), GridWidth, GridHeight));
+            /*Pixels.Reset(matrixOperationsService.FlipMatrixVertically(Pixels.ToArray(), GridWidth, GridHeight));
             AddHistoryState("Flip Grid Vertically");
-            IsDirty = true;
+            IsDirty = true;*/
         }
 
         private ICommand flipGridHorizontallyCommand;
@@ -1011,9 +655,9 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
 
         private void FlipGridHorizontally()
         {
-            Pixels.Reset(matrixOperationsService.FlipMatrixHorizontally(Pixels.ToArray(), GridWidth, GridHeight));
+            /*Pixels.Reset(matrixOperationsService.FlipMatrixHorizontally(Pixels.ToArray(), GridWidth, GridHeight));
             AddHistoryState("Flip Grid Horizontally");
-            IsDirty = true;
+            IsDirty = true;*/
         }
 
         private ICommand openCanvasDialogCommand;
@@ -1031,7 +675,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
 
         private void OpenCanvasDialog()
         {
-            var view = viewFactory.CreateView<ScaleCanvasView>();
+            /*var view = viewFactory.CreateView<ScaleCanvasView>();
             var viewModel = (ScaleCanvasViewModel)view.DataContext;
             viewModel.Setup(GridWidth, GridHeight);
             view.ShowDialog();
@@ -1055,7 +699,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             OnPropertyChanged(nameof(GridWidth));
             OnPropertyChanged(nameof(PixelWidth));
             AddHistoryState("Resize Grid");
-            IsDirty = true;
+            IsDirty = true;*/
         }
 
         private void QuitApplication()

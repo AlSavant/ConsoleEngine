@@ -6,26 +6,44 @@
              mc:Ignorable="d" 
              Name="SpriteGrid"
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid Width="{Binding PixelWidth}" Height="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
-        <ListView ItemsSource="{Binding Pixels}" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden" HorizontalContentAlignment="Center" VerticalAlignment="Center" Cursor="Hand">
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <UniformGrid Background="{Binding GridColor}" Columns="{Binding GridWidth}" Rows="{Binding GridHeight}"/>
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <Button BorderBrush="Black" Background="Black" Foreground="{Binding Color.MediaColor}" Content="{Binding Character}" Width="20" Height="20" Command="{Binding ElementName=SpriteGrid, Path=DataContext.SelectPixelCommand}" CommandParameter="{Binding}"/>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListBoxItem">
-                    <Setter Property="Padding" Value="0"/>
-                    <Setter Property="Margin" Value="-1,-0,-1,-0"/>
-                    <Setter Property="Width" Value="20"/>
-                    <Setter Property="Height" Value="20"/>
-                </Style>
-            </ListView.ItemContainerStyle>
-        </ListView>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0">
+            <CheckBox Content="Show Grid" Margin="5,5,5,5" IsChecked="{Binding ShowGrid}"></CheckBox>
+            <Button Width="40" Margin="5,5,5,5" FontSize="9" Content="Fill" Command="{Binding Path=FillCommand}"/>
+            <Button Width="40" Margin="2,5,5,5" FontSize="9" Content="Clear" Command="{Binding Path=ClearCommand}"/>
+            <CheckBox Content="Is Transparent" Margin="5,5,0,5" IsChecked="{Binding SupportsTransparency}"></CheckBox>
+            <Button DockPanel.Dock="Right" Content="Import" Margin="5,5,5,5" FontSize="9" Width="50" Command="{Binding Path=ImportArtCommand}"></Button>
+            <TextBox DockPanel.Dock="Right" HorizontalAlignment="Right" MaxLines="1" Width="200" Margin="0,5,0,5" Text="{Binding ImportedArt, Mode=TwoWay}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True"/>
+            <Label HorizontalAlignment="Right" DockPanel.Dock="Right" Content="ASCII Art" Margin="5,0,0,0"/>
+        </DockPanel>
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <Grid Width="{Binding PixelWidth}" Height="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <ListView ItemsSource="{Binding Pixels}" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden" HorizontalContentAlignment="Center" VerticalAlignment="Center" Cursor="Hand">
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Background="{Binding GridColor}" Columns="{Binding GridWidth}" Rows="{Binding GridHeight}"/>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Button BorderBrush="Black" Background="Black" Foreground="{Binding Color.MediaColor}" Content="{Binding Character}" Width="20" Height="20" Command="{Binding ElementName=SpriteGrid, Path=DataContext.PaintPixelCommand}" CommandParameter="{Binding}"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Padding" Value="0"/>
+                            <Setter Property="Margin" Value="-1,-0,-1,-0"/>
+                            <Setter Property="Width" Value="20"/>
+                            <Setter Property="Height" Value="20"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                </ListView>
+            </Grid>
+        </ScrollViewer>
     </Grid>
 </UserControl>

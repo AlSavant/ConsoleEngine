@@ -13,11 +13,6 @@
     <None Remove="Resources\Redo_16x.png" />
     <None Remove="Resources\Save_16x.png" />
     <None Remove="Resources\Undo_16x.png" />
-    <None Remove="Views\NewFile_16x.png" />
-    <None Remove="Views\OpenFolder_16x.png" />
-    <None Remove="Views\Redo_16x.png" />
-    <None Remove="Views\Save_16x.png" />
-    <None Remove="Views\Undo_16x.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,15 +37,6 @@
     <Resource Include="Resources\Undo_16x.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Views\NewFile_16x.png" />
-    <Resource Include="Views\OpenFolder_16x.png" />
-    <Resource Include="Views\Redo_16x.png" />
-    <Resource Include="Views\Save_16x.png" />
-    <Resource Include="Views\Undo_16x.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\Commands\Implementations\" />
   </ItemGroup>
 
   <ItemGroup>

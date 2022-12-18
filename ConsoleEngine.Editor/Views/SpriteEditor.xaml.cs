@@ -16,6 +16,7 @@ namespace ConsoleEngine.Editor
     {
         public MainWindow()
         {
+            DataContext = null;
             InitializeComponent();
         }
 
@@ -106,13 +107,13 @@ namespace ConsoleEngine.Editor
             if (z)
             {
                 //Undo
-                context.Undo();
+                context.UndoCommand.Execute(null);
                 return;
             }
             if (y)
             {
                 //Redo
-                context.Redo();
+                context.RedoCommand.Execute(null);
                 return;
             }
 

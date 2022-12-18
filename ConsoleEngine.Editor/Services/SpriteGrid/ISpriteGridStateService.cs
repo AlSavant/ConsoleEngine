@@ -13,5 +13,7 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid
         void SetGridWidth(int width);
         void SetGridHeight(int height);
         void SetGridSize(Vector2Int size);
+        void SetTransparencyMode(bool enabled);
+        bool SupportsTransparency();
     }
 }

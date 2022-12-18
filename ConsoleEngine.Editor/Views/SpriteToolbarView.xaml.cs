@@ -4,11 +4,11 @@ using System.Windows.Controls;
 namespace ConsoleEngine.Editor.Views
 {
     /// <summary>
-    /// Interaction logic for SpriteGridView.xaml
+    /// Interaction logic for SpriteToolbarView.xaml
     /// </summary>
-    public partial class SpriteGridView : UserControl, IView<ISpriteGridViewModel>
+    public partial class SpriteToolbarView : UserControl, IView<ISpriteToolbarViewModel>
     {
-        public SpriteGridView()
+        public SpriteToolbarView()
         {
             DataContext = null;
             InitializeComponent();

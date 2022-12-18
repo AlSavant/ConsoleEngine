@@ -21,8 +21,8 @@ namespace ConsoleEngine.Editor
             serviceProvider = new ServiceCollection()
                 .AddServices()
                 .BuildProvider();
-            CompositionTarget.Rendering += InjectWindows!;
-        }
+            CompositionTarget.Rendering += InjectWindows!;            
+        }        
 
         private void InjectWindows(object sender, EventArgs args)
         {

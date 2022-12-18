@@ -12,6 +12,8 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid
         void SetPixel(int index, char character, ColorEntry colorEntry);
         void SetPixels(Dictionary<int, Pixel> pixels);
         void ApplyGridSize();
+        void Clear();
+        void ColorFill(ColorEntry colorEntry);
         void Fill(char character, ColorEntry colorEntry);
         void FlipHorizontally();
         void FlipVertically();

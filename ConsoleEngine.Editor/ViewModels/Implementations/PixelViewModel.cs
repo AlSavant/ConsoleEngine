@@ -1,14 +1,14 @@
-﻿using ConsoleEngine.Editor.ViewModels.Implementations;
+﻿using ConsoleEngine.Editor.Model;
 
-namespace ConsoleEngine.Editor.Model
+namespace ConsoleEngine.Editor.ViewModels.Implementations
 {
-    internal sealed class PixelEntry : ViewModel
+    internal sealed class PixelViewModel : ViewModel
     {
-        public static PixelEntry Default
+        public static PixelViewModel Default
         {
             get
             {
-                var entry = new PixelEntry();
+                var entry = new PixelViewModel();
                 entry.Character = ' ';
                 entry.Color = ColorEntry.FromConsoleColor(System.ConsoleColor.Black);
                 return entry;
@@ -41,9 +41,9 @@ namespace ConsoleEngine.Editor.Model
             }
         }
 
-        public PixelEntry Clone()
+        public PixelViewModel Clone()
         {
-            var clone = new PixelEntry();
+            var clone = new PixelViewModel();
             clone.Character = Character;
             clone.Color = Color;
             return clone;

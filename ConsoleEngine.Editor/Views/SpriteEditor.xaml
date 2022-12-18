@@ -2,8 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"   
-        xmlns:models="clr-namespace:ConsoleEngine.Editor.Model" 
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"           
         xmlns:views="clr-namespace:ConsoleEngine.Editor.Views"
         mc:Ignorable="d"
         Title="Sprite Editor" Height="600" Width="1000" Name="SpriteEditor" KeyDown="SpriteEditor_KeyDown">
@@ -16,7 +15,7 @@
             <MenuItem Header="_File">
                 <MenuItem Command="{Binding NewSpriteCommand}">
                     <MenuItem.Icon>
-                        <Image Source="/Views/NewFile_16x.png"></Image>
+                        <Image Source="/Resources/NewFile_16x.png"></Image>
                     </MenuItem.Icon>
                     <MenuItem.Header>
                         <Grid>
@@ -31,7 +30,7 @@
                 </MenuItem>
                 <MenuItem Command="{Binding OpenSpriteCommand}">
                     <MenuItem.Icon>
-                        <Image Source="/Views/OpenFolder_16x.png"></Image>
+                        <Image Source="/Resources/OpenFolder_16x.png"></Image>
                     </MenuItem.Icon>
                     <MenuItem.Header>
                         <Grid>
@@ -47,7 +46,7 @@
                 <Separator/>
 				<MenuItem Command="{Binding SaveFileCommand}" IsEnabled="{Binding CanSave}">
                     <MenuItem.Icon>
-                        <Image Source="/Views/Save_16x.png"></Image>
+                        <Image Source="/Resources/Save_16x.png"></Image>
                     </MenuItem.Icon>
                     <MenuItem.Header>
                         <Grid>
@@ -62,7 +61,7 @@
                 </MenuItem>
 				<MenuItem Command="{Binding SaveFileWithLocationCommand}" IsEnabled="{Binding IsDirty}">
                     <MenuItem.Icon>
-						<Image Source="/Views/Save_16x.png"></Image>
+                        <Image Source="/Resources/Save_16x.png"></Image>
                     </MenuItem.Icon>
                     <MenuItem.Header>
                         <Grid>
@@ -106,7 +105,7 @@
             <MenuItem Header="_Edit">
 				<MenuItem Command="{Binding UndoCommand}">
                     <MenuItem.Icon>
-                        <Image Source="/Views/Undo_16x.png"></Image>
+                        <Image Source="/Resources/Undo_16x.png"></Image>
                     </MenuItem.Icon>
                     <MenuItem.Header>
                         <Grid>
@@ -124,7 +123,7 @@
                 </MenuItem>
 				<MenuItem Command="{Binding RedoCommand}">
                     <MenuItem.Icon>
-                        <Image Source="/Views/Redo_16x.png"></Image>
+                        <Image Source="/Resources/Redo_16x.png"></Image>
                     </MenuItem.Icon>
                     <MenuItem.Header>
                         <Grid>
@@ -157,77 +156,11 @@
                 <ColumnDefinition Width="125"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <GroupBox Header="Characters">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="20"/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <CheckBox Content="Paint Characters" IsChecked="{Binding CanPaintCharacters, Mode=TwoWay}"></CheckBox>
-                    <ListBox IsEnabled="{Binding CanPaintCharacters}" Grid.Row="1" ItemsSource="{Binding CharacterList}" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectedIndex="{Binding SelectedCharacterIndex, Mode=TwoWay}" Cursor="Hand">
-                        <ListBox.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <UniformGrid Columns="3" VerticalAlignment="Top" HorizontalAlignment="Left"/>
-                            </ItemsPanelTemplate>
-                        </ListBox.ItemsPanel>
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <ListBoxItem Background="LightGray" IsHitTestVisible="False" Width="20" Height="20" Content="{Binding}"/>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem">
-                                <Setter Property="Padding" Value="5,0,0,0"/>
-                                <Setter Property="Margin" Value="0"/>
-                                <Setter Property="Width" Value="30"/>
-                                <Setter Property="Height" Value="30"/>
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-                    </ListBox>
-                </Grid>
-            </GroupBox>
+            <Grid Grid.Column="0">
+                <views:SpriteToolbarView/>
+            </Grid>
             <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="60"/>
-                    <RowDefinition Height="25"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid Grid.Row="0">
-                    <GroupBox Header="Color Palette">
-                        <ListBox ItemsSource="{Binding ColorList}" SelectedIndex="{Binding SelectedColorIndex, Mode=TwoWay}" Cursor="Hand">
-                            <ListBox.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <UniformGrid Rows="1" HorizontalAlignment="Left"/>
-                                </ItemsPanelTemplate>
-                            </ListBox.ItemsPanel>
-                            <ListBox.ItemTemplate>
-                                <DataTemplate DataType="{x:Type models:ColorEntry}">
-                                    <ListBoxItem Background="{Binding MediaColor}" IsHitTestVisible="False" Width="20" Height="20"/>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                            <ListBox.ItemContainerStyle>
-                                <Style TargetType="ListBoxItem">
-                                    <Setter Property="Padding" Value="5,0,0,0"/>
-                                    <Setter Property="Margin" Value="0"/>
-                                    <Setter Property="Width" Value="30"/>
-                                    <Setter Property="Height" Value="30"/>
-                                </Style>
-                            </ListBox.ItemContainerStyle>
-                        </ListBox>
-                    </GroupBox>
-                </Grid>
-                <DockPanel Grid.Row="1">
-                    <CheckBox Content="Show Grid" Margin="5,5,5,5" IsChecked="{Binding ShowGrid}"></CheckBox>
-                    <Button Width="40" Margin="5,5,5,5" FontSize="9" Content="Fill" Command="{Binding Path=FillCommand}"/>
-                    <Button Width="40" Margin="2,5,5,5" FontSize="9" Content="Clear" Command="{Binding Path=ClearCommand}"/>
-                    <CheckBox Content="Is Transparent" Margin="5,5,0,5" IsChecked="{Binding SupportsTransparency}"></CheckBox>
-                    <Button DockPanel.Dock="Right" Content="Import" Margin="5,5,5,5" FontSize="9" Width="50" Command="{Binding Path=ImportArtCommand}"></Button>
-                    <TextBox DockPanel.Dock="Right" HorizontalAlignment="Right" MaxLines="1" Width="200" Margin="0,5,0,5" Text="{Binding ImportedArt, Mode=TwoWay}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True"/>
-                    <Label HorizontalAlignment="Right" DockPanel.Dock="Right" Content="ASCII Art" Margin="5,0,0,0"/>
-                </DockPanel>
-                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-                    <views:SpriteGridView/>
-                </ScrollViewer>
+                <views:SpriteGridView/>
             </Grid>
         </Grid>
     </Grid>

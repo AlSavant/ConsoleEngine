@@ -1,13 +1,16 @@
 ﻿using ConsoleEngine.Editor.Model.History;
 using ConsoleEngine.Editor.Services.History.Actions;
 using ConsoleEngine.Editor.Services.Factories;
-using System;
 using System.Collections.Generic;
+using System;
+using DataModel.ComponentModel;
 
 namespace ConsoleEngine.Editor.Services.History.Implementations
 {
     internal sealed class HistoryActionService : IHistoryActionService
     {
+        public Action<INotifyPropertyChanged, IPropertyChangedEventArgs>? PropertyChanged { get; set; }
+
         private uint bufferSize;
         private int currentIndex;
 
@@ -55,7 +58,7 @@ namespace ConsoleEngine.Editor.Services.History.Implementations
                 }
                 return string.Empty;
             }
-        }
+        }        
 
         public void AddHistoryAction<T1, T2>(T2 state) where T1 : IHistoryAction<T2> where T2 : HistoryState
         {
@@ -84,6 +87,7 @@ namespace ConsoleEngine.Editor.Services.History.Implementations
                 historyActionFactory.Dispose(toDispose);
             }
             currentIndex = actions.Count - 1;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HistoryChanged"));            
         }
 
         public void ApplyPreviousAction()
@@ -92,7 +96,8 @@ namespace ConsoleEngine.Editor.Services.History.Implementations
                 return;
             actions[currentIndex].Undo();
             currentIndex--;
-            actions[currentIndex].Redo();
+            //actions[currentIndex].Redo();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HistoryChanged"));
         }
 
         public void ApplyNextAction()
@@ -101,7 +106,8 @@ namespace ConsoleEngine.Editor.Services.History.Implementations
                 return;
             actions[currentIndex].Undo();
             currentIndex++;
-            actions[currentIndex].Redo();
+            //actions[currentIndex].Redo();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HistoryChanged"));
         }
     }
 }

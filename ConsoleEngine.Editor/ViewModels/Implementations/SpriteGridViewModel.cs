@@ -1,5 +1,6 @@
 ﻿using ConsoleEngine.Editor.Model;
 using ConsoleEngine.Editor.Model.ComponentModel.Implementations;
+using ConsoleEngine.Editor.Services.Commands;
 using ConsoleEngine.Editor.Services.SpriteGrid;
 using DataModel.ComponentModel;
 using System.Collections.Generic;
@@ -12,14 +13,58 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
     {
         private readonly ISpriteGridStateService spriteGridStateService;
         private readonly ICanvasDrawingService canvasDrawingService;
+        private readonly ISpriteToolbarStateService spriteToolbarStateService;
 
-        public SpriteGridViewModel(ISpriteGridStateService spriteGridStateService, ICanvasDrawingService canvasDrawingService)
+        public ICommand PaintPixelCommand { get; private set; }
+        public ICommand ClearCommand { get; private set; }
+        public ICommand FillCommand { get; private set; }
+
+        public SpriteGridViewModel(
+            ISpriteToolbarStateService spriteToolbarStateService,
+            ISpriteGridStateService spriteGridStateService, 
+            ICanvasDrawingService canvasDrawingService,
+            IPaintPixelCommand paintPixelCommand,
+            IClearSpriteGridCommand clearSpriteGridCommand, 
+            IFillSpriteGridCommand fillSpriteGridCommand)
         {
+            this.spriteToolbarStateService = spriteToolbarStateService;
             this.spriteGridStateService = spriteGridStateService;
             this.canvasDrawingService = canvasDrawingService;
+            paintPixelCommand.SetParameterResolver(PaintPixelParameterResolver);
+            PaintPixelCommand = paintPixelCommand;
+            ClearCommand = clearSpriteGridCommand;
+            FillCommand = fillSpriteGridCommand;
             spriteGridStateService.PropertyChanged += OnGridSizeChangedEvent;
             canvasDrawingService.PropertyChanged += OnPixelsChangedEvent;
+            spriteGridStateService.PropertyChanged += OnGridVisibilityChanged;
             canvasDrawingService.ApplyGridSize();
+        }
+
+        private KeyValuePair<int, Pixel> PaintPixelParameterResolver(object? binding)
+        {
+            if (binding == null)
+                return default;
+            var pixelEntry = (PixelViewModel)binding;
+            if (pixelEntry == null)
+                return default;
+            if (Pixels == null)
+                return default;
+            var index = Pixels.IndexOf(pixelEntry);
+            char character = pixelEntry.Character;
+            if(spriteToolbarStateService.CanPaintCharacters())
+            {
+                character = spriteToolbarStateService.GetSelectedCharacter();
+            }
+            return new KeyValuePair<int, Pixel>(index, new Pixel(
+                    character, 
+                    spriteToolbarStateService.GetSelectedColor()));
+        }
+
+        private void OnGridVisibilityChanged(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
+        {
+            if (args.PropertyName != "GridVisibility")
+                return;
+            OnPropertyChanged(nameof(ShowGrid));
         }
 
         private void OnPixelsChangedEvent(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
@@ -28,10 +73,10 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                 return;
             if(Pixels == null)
             {
-                Pixels = new SmartCollection<PixelEntry>();
+                Pixels = new SmartCollection<PixelViewModel>();
                 for(int i = 0; i < GridWidth * GridHeight; i++)
                 {
-                    Pixels.Add(PixelEntry.Default);
+                    Pixels.Add(PixelViewModel.Default);
                 }
             }
             var pixels = (CanvasPixelsChangedEventArgs)args;
@@ -51,7 +96,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             var newCount = newSize.x * newSize.y;
             if(Pixels == null)
             {
-                Pixels = new SmartCollection<PixelEntry>();
+                Pixels = new SmartCollection<PixelViewModel>();
             }
             if (Pixels.Count > newCount)
             {
@@ -59,10 +104,10 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             }
             else if (Pixels.Count < newCount)
             {
-                List<PixelEntry> newEntries = new List<PixelEntry>(newCount - Pixels.Count);
+                List<PixelViewModel> newEntries = new List<PixelViewModel>(newCount - Pixels.Count);
                 for (int i = 0; i < newCount - Pixels.Count; i++)
                 {
-                    newEntries.Add(PixelEntry.Default);
+                    newEntries.Add(PixelViewModel.Default);
                 }
                 Pixels.AddRange(newEntries);
             }
@@ -122,8 +167,53 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             }
         }
 
-        public SmartCollection<PixelEntry>? Pixels { get; set; }       
-        
-        public ICommand SelectPixelCommand { get; set; }
+        public SmartCollection<PixelViewModel>? Pixels { get; set; }
+
+        public bool SupportsTransparency
+        {
+            get
+            {
+                return spriteGridStateService.SupportsTransparency();
+            }
+            set
+            {
+                if (value != spriteGridStateService.SupportsTransparency())
+                {
+                    spriteGridStateService.SetTransparencyMode(value);
+                    OnPropertyChanged(nameof(SupportsTransparency));
+                    //IsDirty = true;
+                }
+            }
+        }
+
+        public bool ShowGrid
+        {
+            get
+            {
+                return spriteGridStateService.CanShowGrid();
+            }
+            set
+            {
+                if (value != spriteGridStateService.CanShowGrid())
+                {
+                    spriteGridStateService.SetGridVisibility(value);
+                    OnPropertyChanged(nameof(ShowGrid));
+                    OnPropertyChanged(nameof(GridColor));
+                }
+            }
+        }        
+
+        private string importedArt;
+        public string ImportedArt
+        {
+            get
+            {
+                return importedArt;
+            }
+            set
+            {
+                SetProperty(ref importedArt, value, nameof(ImportedArt));
+            }
+        }
     }
 }

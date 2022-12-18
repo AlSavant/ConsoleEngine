@@ -53,7 +53,7 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
             var dict = new Dictionary<int, KeyValuePair<Pixel, Pixel>>();
             foreach (var pixelEntry in pixels)
             {
-                if (this.pixels.Length >= pixelEntry.Key)
+                if (pixelEntry.Key >= this.pixels.Length)
                     continue;
                 var previousPixel = this.pixels[pixelEntry.Key];
                 if(SetPixelNoBroadcast(pixelEntry.Key, pixelEntry.Value.character, pixelEntry.Value.colorEntry))
@@ -74,7 +74,7 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
 
         public void SetPixel(int index, char character, ColorEntry colorEntry)
         {            
-            if (pixels.Length >= index)
+            if (index >= pixels.Length)
                 return;
             var currentPixel = pixels[index];
             if (SetPixelNoBroadcast(index, character, colorEntry))
@@ -105,6 +105,52 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
         {
             pixels = new Pixel[spriteGridStateService.GetGridWidth() * spriteGridStateService.GetGridHeight()];
             PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", Enumerable.Range(0, pixels.Length).ToArray()));
+        }
+
+        public void Clear()
+        {
+            if (pixels == null)
+                return;
+            var changedPixels = new Dictionary<int, KeyValuePair<Pixel, Pixel>>();
+            List<int> dirtyPixels = new List<int>();
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                var previousPixel = pixels[i];
+                if (SetPixelNoBroadcast(i, ' ', ColorEntry.FromConsoleColor(ConsoleColor.Black)))
+                {
+                    dirtyPixels.Add(i);
+                    changedPixels.Add(i, new KeyValuePair<Pixel, Pixel>(previousPixel, pixels[i]));
+                }
+            }
+            if (dirtyPixels.Count > 0)
+            {
+                var gridSize = spriteGridStateService.GetGridSize();
+                historyActionService.AddHistoryAction<IPixelsPaintedAction, PixelsPaintedState>(new PixelsPaintedState("Clear", changedPixels, new KeyValuePair<Vector2Int, Vector2Int>(gridSize, gridSize)));
+                PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", dirtyPixels.ToArray()));
+            }
+        }
+
+        public void ColorFill(ColorEntry colorEntry)
+        {
+            if (pixels == null)
+                return;
+            var changedPixels = new Dictionary<int, KeyValuePair<Pixel, Pixel>>();
+            List<int> dirtyPixels = new List<int>();
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                var previousPixel = pixels[i];
+                if (SetPixelNoBroadcast(i, previousPixel.character, colorEntry))
+                {
+                    dirtyPixels.Add(i);
+                    changedPixels.Add(i, new KeyValuePair<Pixel, Pixel>(previousPixel, pixels[i]));
+                }
+            }
+            if (dirtyPixels.Count > 0)
+            {
+                var gridSize = spriteGridStateService.GetGridSize();
+                historyActionService.AddHistoryAction<IPixelsPaintedAction, PixelsPaintedState>(new PixelsPaintedState("Fill", changedPixels, new KeyValuePair<Vector2Int, Vector2Int>(gridSize, gridSize)));
+                PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", dirtyPixels.ToArray()));
+            }
         }
 
         public void Fill(char character, ColorEntry colorEntry)

@@ -9,7 +9,8 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
         public Action<INotifyPropertyChanged, IPropertyChangedEventArgs>? PropertyChanged { get; set; }
 
         private Vector2Int gridSize = new Vector2Int(20, 20);
-        private bool showGrid = true;        
+        private bool showGrid = true;
+        private bool supportTransparency;
 
         public Vector2Int GetGridSize()
         {
@@ -33,7 +34,11 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
 
         public void SetGridVisibility(bool isVisible)
         {
-            showGrid = isVisible;
+            if(showGrid != isVisible)
+            {
+                showGrid = isVisible;
+            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("GridVisibility"));
         }
 
         public void SetGridWidth(int width)
@@ -58,6 +63,16 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
                 return;
             gridSize = size;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("GridSize"));
+        }
+
+        public void SetTransparencyMode(bool enabled)
+        {
+            supportTransparency = enabled;
+        }
+
+        public bool SupportsTransparency()
+        {
+            return supportTransparency;
         }
     }
 }
