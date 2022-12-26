@@ -107,16 +107,20 @@ namespace ConsoleEngine.Editor
             if (z)
             {
                 //Undo
-                context.UndoCommand.Execute(null);
+                context.UndoCommand?.Execute(null);
+                context.UndoCommand?.NotifyCanExecuteChanged();
+                context.RedoCommand?.NotifyCanExecuteChanged();
                 return;
             }
             if (y)
             {
                 //Redo
-                context.RedoCommand.Execute(null);
+                context.RedoCommand?.Execute(null);
+                context.UndoCommand?.NotifyCanExecuteChanged();
+                context.RedoCommand?.NotifyCanExecuteChanged();
                 return;
             }
 
-        }
+        }        
     }
 }

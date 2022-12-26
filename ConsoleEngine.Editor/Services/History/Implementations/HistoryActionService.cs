@@ -110,7 +110,7 @@ namespace ConsoleEngine.Editor.Services.History.Implementations
                 return;
             isChangingState = true;
             currentIndex += 1;
-            actions[currentIndex].Redo();            
+            actions[currentIndex].Redo();                 
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HistoryChanged"));
             isChangingState = false;
         }

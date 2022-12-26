@@ -1,10 +1,11 @@
-﻿using System;
-using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.Input;
+using System;
 
 namespace ConsoleEngine.Editor.Services.Commands
 {
-    internal interface ILogicCommand : IService, ICommand
+    internal interface ILogicCommand : IService, IRelayCommand
     {
+       
     }
 
     internal interface ILogicCommand<T> : ILogicCommand

@@ -11,7 +11,7 @@
             <RowDefinition Height="20"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        <Menu Grid.Row="0">
+        <Menu Grid.Row="0" Name="TopMenu">
             <MenuItem Header="_File">
                 <MenuItem Command="{Binding NewSpriteCommand}">
                     <MenuItem.Icon>
@@ -103,7 +103,7 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="_Edit">
-				<MenuItem Command="{Binding UndoCommand}">
+                <MenuItem Command="{Binding UndoCommand}">
                     <MenuItem.Icon>
                         <Image Source="/Resources/Undo_16x.png"></Image>
                     </MenuItem.Icon>
@@ -121,7 +121,7 @@
                         </Grid>
                     </MenuItem.Header>
                 </MenuItem>
-				<MenuItem Command="{Binding RedoCommand}">
+                <MenuItem Command="{Binding RedoCommand}">
                     <MenuItem.Icon>
                         <Image Source="/Resources/Redo_16x.png"></Image>
                     </MenuItem.Icon>

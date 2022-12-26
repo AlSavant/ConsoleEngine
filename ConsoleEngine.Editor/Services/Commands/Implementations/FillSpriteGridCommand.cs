@@ -13,12 +13,12 @@ namespace ConsoleEngine.Editor.Services.Commands.Implementations
             this.spriteToolbarStateService = spriteToolbarStateService;
         }
 
-        protected override bool CanExecuteCommand()
+        protected override bool CanExecuteCommand(object? parameter)
         {
             return true;
         }
 
-        protected override void ExecuteCommand()
+        protected override void ExecuteCommand(object? parameter)
         {
             var color = spriteToolbarStateService.GetSelectedColor();
             if(spriteToolbarStateService.CanPaintCharacters())

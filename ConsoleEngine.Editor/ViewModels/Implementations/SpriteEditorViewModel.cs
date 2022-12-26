@@ -10,7 +10,7 @@ using ConsoleEngine.Editor.Views;
 using DataModel.ComponentModel;
 using DataModel.Math.Structures;
 using DataModel.Rendering;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -95,8 +95,8 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
         private readonly ICharToOEM437ConverterService charToOEM437ConverterService;
         private readonly IHistoryActionService historyActionService;
 
-        public ICommand UndoCommand { get; private set; }
-        public ICommand RedoCommand { get; private set; }
+        public ILogicCommand UndoCommand { get; private set; }
+        public ILogicCommand RedoCommand { get; private set; }
 
         public SpriteEditorViewModel(
             IUndoActionCommand undoActionCommand,
@@ -106,7 +106,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             IViewFactory viewFactory,
             IMatrixOperationsService matrixOperationsService,
             ISpriteGridStateService spriteGridStateService)
-        {
+        {            
             this.historyActionService = historyActionService;
             this.charToOEM437ConverterService = charToOEM437ConverterService;
             this.viewFactory = viewFactory;
@@ -115,14 +115,18 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             historyActionService.SetMaxActionBuffer(10);
             UndoCommand = undoActionCommand;
             RedoCommand = redoActionCommand;
+            historyActionService.PropertyChanged += OnHistoryActionChanged;
             Setup();
         }       
 
         private void OnHistoryActionChanged(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
         {
+            if (!args.PropertyName.Equals("HistoryChanged"))
+                return;                             
             OnPropertyChanged(nameof(UndoAction));
             OnPropertyChanged(nameof(RedoAction));            
-            CommandManager.InvalidateRequerySuggested();
+            UndoCommand.NotifyCanExecuteChanged();
+            RedoCommand.NotifyCanExecuteChanged();
         }
 
         public string UndoAction
@@ -163,25 +167,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             }
             OnPropertyChanged(nameof(CanBrowseRecents));
             IsDirty = false;
-        }
-        
-
-        public bool CanUndo
-        {
-            get
-            {
-                return historyActionService.CanUndo;
-            }
-        }
-
-        public bool CanRedo
-        {
-            get
-            {
-                return historyActionService.CanRedo;
-
-            }
-        }               
+        }                       
 
         private void OnGridResized()
         {

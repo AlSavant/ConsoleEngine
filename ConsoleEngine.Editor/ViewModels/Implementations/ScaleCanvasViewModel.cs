@@ -1,5 +1,5 @@
 ﻿using ConsoleEngine.Editor.Model;
-using GalaSoft.MvvmLight.CommandWpf;
+using CommunityToolkit.Mvvm.Input;
 using System.Windows;
 using System.Windows.Input;
 
@@ -320,10 +320,10 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             }
         }
 
-        private void Apply(Window window)
+        private void Apply(Window? window)
         {
             ApplyChanges = true;
-            window.Close();
+            window?.Close();
         }
 
         private ICommand? cancelCommand;
@@ -341,10 +341,10 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             }
         }
 
-        private void Cancel(Window window)
+        private void Cancel(Window? window)
         {
             ApplyChanges = false;
-            window.Close();
+            window?.Close();
         }
     }
 }

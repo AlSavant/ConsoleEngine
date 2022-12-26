@@ -11,12 +11,12 @@ namespace ConsoleEngine.Editor.Services.Commands.Implementations
             this.historyActionService = historyActionService;
         }
 
-        protected override bool CanExecuteCommand()
+        protected override bool CanExecuteCommand(object? parameter)
         {
             return historyActionService.CanUndo;   
         }
 
-        protected override void ExecuteCommand()
+        protected override void ExecuteCommand(object? parameter)
         {
             historyActionService.ApplyPreviousAction();
         }
