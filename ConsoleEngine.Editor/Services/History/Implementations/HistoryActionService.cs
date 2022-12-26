@@ -12,15 +12,16 @@ namespace ConsoleEngine.Editor.Services.History.Implementations
         public Action<INotifyPropertyChanged, IPropertyChangedEventArgs>? PropertyChanged { get; set; }
 
         private uint bufferSize;
-        private int currentIndex;
+        private int currentIndex = -1;
+        private bool isChangingState = false;
 
         private List<IHistoryAction> actions;
 
         private readonly IHistoryActionFactory historyActionFactory;
 
-        public bool CanUndo { get { return currentIndex > 0; } }
+        public bool CanUndo { get { return currentIndex >= 0; } }
         public bool CanRedo { get { return currentIndex < actions.Count - 1; } }
-
+       
         public HistoryActionService(IHistoryActionFactory historyActionFactory)
         {
             this.historyActionFactory = historyActionFactory;
@@ -62,6 +63,8 @@ namespace ConsoleEngine.Editor.Services.History.Implementations
 
         public void AddHistoryAction<T1, T2>(T2 state) where T1 : IHistoryAction<T2> where T2 : HistoryState
         {
+            if (isChangingState)
+                return;
             T1 action = historyActionFactory.CreateInstance<T1>();
             action.Record(state);
             if(CanRedo)
@@ -94,20 +97,22 @@ namespace ConsoleEngine.Editor.Services.History.Implementations
         {
             if (!CanUndo)
                 return;
+            isChangingState = true;
             actions[currentIndex].Undo();
-            currentIndex--;
-            //actions[currentIndex].Redo();
+            currentIndex -= 1;            
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HistoryChanged"));
+            isChangingState = false;
         }
 
         public void ApplyNextAction()
         {
             if (!CanRedo)
                 return;
-            actions[currentIndex].Undo();
-            currentIndex++;
-            //actions[currentIndex].Redo();
+            isChangingState = true;
+            currentIndex += 1;
+            actions[currentIndex].Redo();            
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HistoryChanged"));
+            isChangingState = false;
         }
     }
 }
