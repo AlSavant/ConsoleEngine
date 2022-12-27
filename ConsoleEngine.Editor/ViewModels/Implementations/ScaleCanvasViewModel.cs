@@ -2,6 +2,8 @@
 using CommunityToolkit.Mvvm.Input;
 using System.Windows;
 using System.Windows.Input;
+using ConsoleEngine.Editor.Services.SpriteGrid;
+using DataModel.Math.Structures;
 
 namespace ConsoleEngine.Editor.ViewModels.Implementations
 {
@@ -96,21 +98,24 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                     UpdateGrid();
                 }
             }
-        }
-
-        public bool ApplyChanges { get; set; }
+        }        
 
         public SmartCollection<char> PivotGrid { get; set; }
 
-        public void Setup(int width, int height)
+        private readonly ISpriteGridStateService spriteGridStateService;
+        private readonly ICanvasDrawingService canvasDrawingService;
+
+        public ScaleCanvasViewModel(ISpriteGridStateService spriteGridStateService, ICanvasDrawingService canvasDrawingService)
         {
-            CurrentWidth = width;
-            CurrentHeight = height;
+            this.spriteGridStateService = spriteGridStateService;
+            this.canvasDrawingService = canvasDrawingService;
+            var size = spriteGridStateService.GetGridSize();
+            CurrentWidth = size.x;
+            CurrentHeight = size.y;
             GridWidth = CurrentWidth;
             GridHeight = CurrentHeight;
-            PivotGrid = new SmartCollection<char>();
-            ApplyChanges = false;
-            UpdateGrid();
+            PivotGrid = new SmartCollection<char>();            
+            UpdateGrid();            
         }
 
         private void UpdateGrid()
@@ -322,7 +327,12 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
 
         private void Apply(Window? window)
         {
-            ApplyChanges = true;
+            if (spriteGridStateService.GetGridWidth() == GridWidth && spriteGridStateService.GetGridHeight() == GridHeight)
+                return;
+            int x = PivotIndex % 3;
+            int y = PivotIndex / 3;
+            Vector2Int normalizedPivot = new Vector2Int(x, y);
+            canvasDrawingService.Resize(new Vector2Int(GridWidth, GridHeight), normalizedPivot);
             window?.Close();
         }
 
@@ -342,8 +352,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
         }
 
         private void Cancel(Window? window)
-        {
-            ApplyChanges = false;
+        {            
             window?.Close();
         }
     }

@@ -67,6 +67,7 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
             {
                 var gridSize = spriteGridStateService.GetGridSize();
                 var state = new PixelsPaintedState("Paint Pixels", dict, new KeyValuePair<Vector2Int, Vector2Int>(gridSize, gridSize));
+                spriteGridStateService.SetDirtyStatus(true);
                 historyActionService.AddHistoryAction<IPixelsPaintedAction, PixelsPaintedState>(state);
                 PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", changedPixels.ToArray()));
             }
@@ -82,6 +83,7 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
                 var gridSize = spriteGridStateService.GetGridSize();
                 var dict = new Dictionary<int, KeyValuePair<Pixel, Pixel>>();
                 dict.Add(index, new KeyValuePair<Pixel, Pixel>(currentPixel, pixels[index]));
+                spriteGridStateService.SetDirtyStatus(true);
                 historyActionService.AddHistoryAction<IPixelsPaintedAction, PixelsPaintedState>(new PixelsPaintedState("Paint Pixel", dict, new KeyValuePair<Vector2Int, Vector2Int>(gridSize,gridSize)));
                 PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", new int[] { index }));
             }
@@ -103,7 +105,13 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
 
         public void ApplyGridSize()
         {
-            pixels = new Pixel[spriteGridStateService.GetGridWidth() * spriteGridStateService.GetGridHeight()];
+            var length = spriteGridStateService.GetGridWidth() * spriteGridStateService.GetGridHeight();
+            if (pixels != null && pixels.Length == length)
+                return;
+            if (pixels == null)
+                pixels = new Pixel[length];
+            else if (pixels.Length != length)
+                Array.Resize(ref pixels, length);            
             PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", Enumerable.Range(0, pixels.Length).ToArray()));
         }
 
@@ -125,6 +133,7 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
             if (dirtyPixels.Count > 0)
             {
                 var gridSize = spriteGridStateService.GetGridSize();
+                spriteGridStateService.SetDirtyStatus(true);
                 historyActionService.AddHistoryAction<IPixelsPaintedAction, PixelsPaintedState>(new PixelsPaintedState("Clear", changedPixels, new KeyValuePair<Vector2Int, Vector2Int>(gridSize, gridSize)));
                 PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", dirtyPixels.ToArray()));
             }
@@ -148,6 +157,7 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
             if (dirtyPixels.Count > 0)
             {
                 var gridSize = spriteGridStateService.GetGridSize();
+                spriteGridStateService.SetDirtyStatus(true);
                 historyActionService.AddHistoryAction<IPixelsPaintedAction, PixelsPaintedState>(new PixelsPaintedState("Fill", changedPixels, new KeyValuePair<Vector2Int, Vector2Int>(gridSize, gridSize)));
                 PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", dirtyPixels.ToArray()));
             }
@@ -171,6 +181,7 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
             if (dirtyPixels.Count > 0)
             {
                 var gridSize = spriteGridStateService.GetGridSize();
+                spriteGridStateService.SetDirtyStatus(true);
                 historyActionService.AddHistoryAction<IPixelsPaintedAction, PixelsPaintedState>(new PixelsPaintedState("Fill", changedPixels, new KeyValuePair<Vector2Int, Vector2Int>(gridSize, gridSize)));
                 PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", dirtyPixels.ToArray()));
             }
@@ -182,6 +193,7 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
             if (dict == null || dict.Count <= 0)
                 return;
             var gridSize = spriteGridStateService.GetGridSize();
+            spriteGridStateService.SetDirtyStatus(true);
             var state = new PixelsPaintedState("Flip Grid Horizontally", dict, new KeyValuePair<Vector2Int, Vector2Int>(gridSize, gridSize));
             historyActionService.AddHistoryAction<IPixelsPaintedAction, PixelsPaintedState>(state);
             PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", dict.Keys.ToArray()));
@@ -193,6 +205,7 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
             if (dict == null || dict.Count <= 0)
                 return;
             var gridSize = spriteGridStateService.GetGridSize();
+            spriteGridStateService.SetDirtyStatus(true);
             var state = new PixelsPaintedState("Flip Grid Vertically", dict, new KeyValuePair<Vector2Int, Vector2Int>(gridSize, gridSize));
             historyActionService.AddHistoryAction<IPixelsPaintedAction, PixelsPaintedState>(state);
             PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", dict.Keys.ToArray()));            
@@ -204,6 +217,7 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
             if (dict == null || dict.Count <= 0)
                 return;
             var gridSize = spriteGridStateService.GetGridSize();
+            spriteGridStateService.SetDirtyStatus(true);
             var state = new PixelsPaintedState("Rotate Grid 180°", dict, new KeyValuePair<Vector2Int, Vector2Int>(gridSize, gridSize));
             historyActionService.AddHistoryAction<IPixelsPaintedAction, PixelsPaintedState>(state);
             PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", dict.Keys.ToArray()));
@@ -216,6 +230,7 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
                 return;
             var size = spriteGridStateService.GetGridSize();
             spriteGridStateService.SetGridSize(new Vector2Int(size.y, size.x));
+            spriteGridStateService.SetDirtyStatus(true);
             var state = new PixelsPaintedState("Rotate Grid 90° CW", dict, new KeyValuePair<Vector2Int, Vector2Int>(size, spriteGridStateService.GetGridSize()));
             historyActionService.AddHistoryAction<IPixelsPaintedAction, PixelsPaintedState>(state);
             PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", dict.Keys.ToArray()));
@@ -228,6 +243,7 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
                 return;
             var size = spriteGridStateService.GetGridSize();
             spriteGridStateService.SetGridSize(new Vector2Int(size.y, size.x));
+            spriteGridStateService.SetDirtyStatus(true);
             var state = new PixelsPaintedState("Rotate Grid 90° CCW", dict, new KeyValuePair<Vector2Int, Vector2Int>(size, spriteGridStateService.GetGridSize()));
             historyActionService.AddHistoryAction<IPixelsPaintedAction, PixelsPaintedState>(state);
             PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", dict.Keys.ToArray()));
@@ -238,8 +254,7 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
             var oldSize = spriteGridStateService.GetGridSize();
             if (newSize == oldSize)
                 return;
-            var newPixels = matrixOperationsService.ResizeMatrix(pixels, oldSize.x, oldSize.y, newSize.x, newSize.y, pivot);
-
+            var newPixels = matrixOperationsService.ResizeMatrix(pixels, oldSize.x, oldSize.y, newSize.x, newSize.y, pivot);            
             var dict = new Dictionary<int, KeyValuePair<Pixel, Pixel>>();
             for (int i = 0; i < newPixels.Length; i++)
             {
@@ -264,9 +279,10 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
                 dict.Add(i, new KeyValuePair<Pixel, Pixel>(previousPixel, newPixel));
             }
             if(dict.Count > 0)
-            {
+            {                
                 pixels = newPixels;
-                spriteGridStateService.SetGridSize(new Vector2Int(newSize.y, newSize.x));
+                spriteGridStateService.SetGridSize(new Vector2Int(newSize.x, newSize.y));
+                spriteGridStateService.SetDirtyStatus(true);
                 var state = new PixelsPaintedState("Resize Grid", dict, new KeyValuePair<Vector2Int, Vector2Int>(oldSize, newSize));
                 historyActionService.AddHistoryAction<IPixelsPaintedAction, PixelsPaintedState>(state);
                 PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", dict.Keys.ToArray()));

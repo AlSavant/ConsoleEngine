@@ -23,63 +23,15 @@ using System.Text;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
+using ConsoleEngine.Editor.Services.Commands.SpriteCanvas;
+using ConsoleEngine.Editor.Services.IO;
+using ConsoleEngine.Editor.Services.Commands.Serialization;
 
 namespace ConsoleEngine.Editor.ViewModels.Implementations
 {
     internal sealed class SpriteEditorViewModel : ViewModel, ISpriteEditorViewModel
-    {        
-        public bool CanSave
-        {
-            get
-            {
-                return IsDirty && SavePath != string.Empty;
-            }
-        }
-
-        private bool isDirty = true;
-        public bool IsDirty
-        {
-            get
-            {
-                return isDirty;
-            }
-            set
-            {
-                if (SetProperty(ref isDirty, value, nameof(IsDirty)))
-                {
-                    OnPropertyChanged(nameof(CanSave));
-                }
-            }
-        }
-
-        private string savePath = string.Empty;
-        public string SavePath
-        {
-            get
-            {
-                return savePath;
-            }
-            set
-            {
-                if (SetProperty(ref savePath, value, nameof(SavePath)))
-                {
-                    OnPropertyChanged(nameof(SavePath));
-                }
-            }
-        }
-
-        private ObservableCollection<string> recentFiles;
-        public ObservableCollection<string> RecentFiles
-        {
-            get
-            {
-                return recentFiles;
-            }
-            set
-            {
-                SetProperty(ref recentFiles, value, nameof(RecentFiles));
-            }
-        }
+    {                        
+        public ObservableCollection<string> RecentFiles {  get { return spriteSavePathService.RecentFiles; } }        
 
         public bool CanBrowseRecents
         {
@@ -89,34 +41,65 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             }
         }        
 
-        private readonly IViewFactory viewFactory;
+        private readonly IViewModelFactory viewModelFactory;
         private readonly IMatrixOperationsService matrixOperationsService;
         private readonly ISpriteGridStateService spriteGridStateService;
         private readonly ICharToOEM437ConverterService charToOEM437ConverterService;
         private readonly IHistoryActionService historyActionService;
+        private readonly ICanvasDrawingService canvasDrawingService;
+        private readonly ISpriteSavePathService spriteSavePathService;
 
         public ILogicCommand UndoCommand { get; private set; }
         public ILogicCommand RedoCommand { get; private set; }
+        public ILogicCommand SaveSpriteCommand { get; private set; }
+        public ILogicCommand SaveSpriteWithLocationCommand { get; private set; }
+
+        public ICommand RotateGrid90CWCommand { get; private set; }
+        public ICommand RotateGrid90CCWCommand { get; private set; }
+        public ICommand RotateGrid180Command { get; private set; }
+        public ICommand FlipGridVerticallyCommand { get; private set; } 
+        public ICommand FlipGridHorizontallyCommand { get; private set; }
 
         public SpriteEditorViewModel(
+            ISaveSpriteWithLocationCommand saveSpriteWithLocationCommand,
+            ISaveSpriteCommand saveSpriteCommand,
+            ISpriteSavePathService spriteSavePathService,
+            ICanvasDrawingService canvasDrawingService,
+            IFlipGridHorizontallyCommand flipGridHorizontallyCommand,
+            IFlipGridVerticallyCommand flipGridVerticallyCommand,
+            IRotateGrid180Command rotateGrid180Command,
+            IRotateGrid90CWCommand rotateGrid90CWCommand,
+            IRotateGrid90CCWCommand rotateGrid90CCWCommand,
             IUndoActionCommand undoActionCommand,
             IRedoActionCommand redoActionCommand,
             IHistoryActionService historyActionService,
             ICharToOEM437ConverterService charToOEM437ConverterService,
-            IViewFactory viewFactory,
+            IViewModelFactory viewModelFactory,
             IMatrixOperationsService matrixOperationsService,
             ISpriteGridStateService spriteGridStateService)
         {            
+            this.spriteSavePathService = spriteSavePathService;
+            this.canvasDrawingService = canvasDrawingService;
             this.historyActionService = historyActionService;
             this.charToOEM437ConverterService = charToOEM437ConverterService;
-            this.viewFactory = viewFactory;
+            this.viewModelFactory = viewModelFactory;
             this.matrixOperationsService = matrixOperationsService;
             this.spriteGridStateService = spriteGridStateService;
             historyActionService.SetMaxActionBuffer(10);
+
             UndoCommand = undoActionCommand;
             RedoCommand = redoActionCommand;
+            SaveSpriteCommand = saveSpriteCommand;
+            SaveSpriteWithLocationCommand = saveSpriteWithLocationCommand;
+            RotateGrid90CWCommand = rotateGrid90CWCommand;
+            RotateGrid90CCWCommand = rotateGrid90CCWCommand;
+            RotateGrid180Command = rotateGrid180Command;
+            FlipGridHorizontallyCommand = flipGridHorizontallyCommand;
+            FlipGridVerticallyCommand = flipGridVerticallyCommand;
+
             historyActionService.PropertyChanged += OnHistoryActionChanged;
-            Setup();
+            spriteGridStateService.PropertyChanged += OnDirtyCanvasChanged;
+            RecentFiles.CollectionChanged += OnRecentFilesChanged;           
         }       
 
         private void OnHistoryActionChanged(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
@@ -127,6 +110,19 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             OnPropertyChanged(nameof(RedoAction));            
             UndoCommand.NotifyCanExecuteChanged();
             RedoCommand.NotifyCanExecuteChanged();
+        }
+
+        private void OnRecentFilesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {            
+            OnPropertyChanged(nameof(CanBrowseRecents));            
+        }
+
+        private void OnDirtyCanvasChanged(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
+        {
+            if (!args.PropertyName.Equals("IsDirty"))
+                return;
+            SaveSpriteCommand.NotifyCanExecuteChanged();
+            SaveSpriteWithLocationCommand.NotifyCanExecuteChanged();
         }
 
         public string UndoAction
@@ -143,43 +139,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             {
                 return historyActionService.RedoActionName;
             }
-        }        
-
-        public void Setup()
-        {                        
-            OnGridResized();            
-            RecentFiles = new ObservableCollection<string>();
-            if (Properties.Settings.Default.RecentFiles == null)
-            {
-                Properties.Settings.Default.RecentFiles = new StringCollection();
-                Properties.Settings.Default.Save();
-            }
-            for (int i = Properties.Settings.Default.RecentFiles.Count - 1; i >= 0; i--)
-            {
-                var file = Properties.Settings.Default.RecentFiles[i];
-                if (!File.Exists(file))
-                {
-                    Properties.Settings.Default.RecentFiles.RemoveAt(i);
-                    Properties.Settings.Default.Save();
-                    continue;
-                }
-                RecentFiles.Add(file);
-            }
-            OnPropertyChanged(nameof(CanBrowseRecents));
-            IsDirty = false;
-        }                       
-
-        private void OnGridResized()
-        {
-            /*var pixels = new List<PixelEntry>(GridHeight * GridWidth);
-            for (int i = 0; i < GridHeight * GridWidth; i++)
-            {
-                pixels.Add(PixelEntry.Default);
-            }
-            Pixels.Reset(pixels);
-            AddHistoryState("Resize Grid");
-            IsDirty = true;*/
-        }                    
+        }                                                             
 
         private ICommand importArtCommand;
         public ICommand ImportArtCommand
@@ -240,101 +200,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             OnPropertyChanged(nameof(PixelWidth));
             AddHistoryState("Import Art");
             IsDirty = true;*/
-        }
-
-        private ICommand saveFileWithLocationCommand;
-        public ICommand SaveFileWithLocationCommand
-        {
-            get
-            {
-                if (saveFileWithLocationCommand == null)
-                {
-                    saveFileWithLocationCommand = new RelayCommand(SaveFileWithLocation);
-                }
-                return saveFileWithLocationCommand;
-            }
-        }
-
-        private void SaveFileWithLocation()
-        {
-            SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "Console Sprite (*.csp)|*.csp";
-            if (SavePath == string.Empty)
-            {
-                saveFileDialog.InitialDirectory = Environment.CurrentDirectory;
-            }
-            else
-            {
-                saveFileDialog.InitialDirectory = Path.GetDirectoryName(SavePath);
-            }
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                SavePath = saveFileDialog.FileName;
-                SaveFile();
-                if (!RecentFiles.Contains(SavePath))
-                {
-                    RecentFiles.Insert(0, SavePath);
-                    Properties.Settings.Default.RecentFiles.Insert(0, SavePath);
-                    Properties.Settings.Default.Save();
-                    OnPropertyChanged(nameof(RecentFiles));
-                    OnPropertyChanged(nameof(CanBrowseRecents));
-                }
-                else
-                {
-                    int idx = RecentFiles.IndexOf(saveFileDialog.FileName);
-                    if (idx > 0)
-                    {
-                        for (int i = 0; i < idx; i++)
-                        {
-                            string movedFile = RecentFiles[i];
-                            RecentFiles[i + 1] = movedFile;
-                            Properties.Settings.Default.RecentFiles[i + 1] = movedFile;
-                        }
-                        RecentFiles[0] = saveFileDialog.FileName;
-                        Properties.Settings.Default.RecentFiles[0] = saveFileDialog.FileName;
-                        Properties.Settings.Default.Save();
-                        OnPropertyChanged(nameof(RecentFiles));
-                    }
-                }
-            }
-
-        }
-
-        private ICommand saveFileCommand;
-        public ICommand SaveFileCommand
-        {
-            get
-            {
-                if (saveFileCommand == null)
-                {
-                    saveFileCommand = new RelayCommand(SaveFile);
-                }
-                return saveFileCommand;
-            }
-        }
-
-        private void SaveFile()
-        {
-            /*var colors = new byte[GridWidth * GridHeight];
-            var characters = new byte[colors.Length];
-            for (int i = 0; i < Pixels.Count; i++)
-            {
-                if (Pixels[i].Color.ConsoleColor == ConsoleColor.Black || Pixels[i].Character == ' ')
-                {
-                    colors[i] = (byte)ConsoleColor.Black;
-                    characters[i] = (byte)' ';
-                    continue;
-                }
-                colors[i] = (byte)Pixels[i].Color.ConsoleColor;
-                characters[i] = charToOEM437ConverterService.CharToByte(Pixels[i].Character);                
-            }
-            var sprite = new Sprite(GridWidth, GridHeight, characters, colors, spriteGridStateService.SupportsTransparency());
-            var formatter = new BinaryFormatter();
-            var stream = new FileStream(SavePath, FileMode.Create, FileAccess.Write, FileShare.None);
-            formatter.Serialize(stream, sprite);
-            stream.Close();
-            IsDirty = false;*/
-        }
+        }               
 
         private ICommand newSpriteCommand;
         public ICommand NewSpriteCommand
@@ -399,9 +265,9 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             var sprite = (Sprite)formatter.Deserialize(stream);
             stream.Close();
             ApplySprite(sprite);
-            IsDirty = false;
+            spriteGridStateService.SetDirtyStatus(false);
             //ImportedArt = string.Empty;
-            SavePath = path;
+            spriteSavePathService.SetCurrentSavePath(path);            
 
             int idx = RecentFiles.IndexOf(path);
             if (idx > 0)
@@ -438,13 +304,13 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                 return;
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Filter = "Console Sprite (*.csp)|*.csp";
-            if (SavePath == string.Empty)
+            if (string.IsNullOrEmpty(spriteSavePathService.GetCurrentSavePath()))
             {
                 openFileDialog.InitialDirectory = Environment.CurrentDirectory;
             }
             else
             {
-                openFileDialog.InitialDirectory = Path.GetDirectoryName(SavePath);
+                openFileDialog.InitialDirectory = Path.GetDirectoryName(spriteSavePathService.GetCurrentSavePath());
             }
             if (openFileDialog.ShowDialog() == true)
             {
@@ -454,14 +320,14 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                 var sprite = (Sprite)formatter.Deserialize(stream);
                 stream.Close();
                 ApplySprite(sprite);
-                IsDirty = false;
+                spriteGridStateService.SetDirtyStatus(false);
                 //ImportedArt = string.Empty;
-                SavePath = filePath;
+                spriteSavePathService.SetCurrentSavePath(filePath);                
 
-                if (!RecentFiles.Contains(SavePath))
+                if (!RecentFiles.Contains(filePath))
                 {
-                    RecentFiles.Insert(0, SavePath);
-                    Properties.Settings.Default.RecentFiles.Insert(0, SavePath);
+                    RecentFiles.Insert(0, filePath);
+                    Properties.Settings.Default.RecentFiles.Insert(0, filePath);
                     if (RecentFiles.Count > 10)
                     {
                         RecentFiles.RemoveAt(10);
@@ -482,12 +348,9 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                         }
                         RecentFiles[0] = openFileDialog.FileName;
                         Properties.Settings.Default.RecentFiles[0] = openFileDialog.FileName;
-                        Properties.Settings.Default.Save();
-                        OnPropertyChanged(nameof(RecentFiles));
+                        Properties.Settings.Default.Save();                        
                     }
-                }
-                OnPropertyChanged(nameof(RecentFiles));
-                OnPropertyChanged(nameof(CanBrowseRecents));
+                }                
             }
         }
 
@@ -513,7 +376,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
 
         private bool DiscardChanges()
         {
-            if (!IsDirty)
+            if (!spriteGridStateService.IsDirty())
                 return true;
             var messageBoxResult = MessageBox.Show("You have pending unsaved changes. Do you wish to discard them?", "Discard Changes", MessageBoxButton.YesNo);
             return messageBoxResult == MessageBoxResult.Yes;
@@ -530,121 +393,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                 }
                 return quitApplicationCommand;
             }
-        }
-
-        private ICommand rotateGrid90CWCommand;
-        public ICommand RotateGrid90CWCommand
-        {
-            get
-            {
-                if (rotateGrid90CWCommand == null)
-                {
-                    rotateGrid90CWCommand = new RelayCommand(RotateGrid90CW);
-                }
-                return rotateGrid90CWCommand;
-            }
-        }
-
-        private void RotateGrid90CW()
-        {
-            /*Pixels.Reset(matrixOperationsService.RotateMatrix90CW(Pixels.ToArray(), GridWidth, GridHeight));
-            int w = gridWidth;
-            int h = gridHeight;
-            gridWidth = h;
-            gridHeight = w;
-            OnPropertyChanged(nameof(GridHeight));
-            OnPropertyChanged(nameof(GridWidth));
-            OnPropertyChanged(nameof(PixelWidth));
-            AddHistoryState("Rotate Grid 90° CW");
-            IsDirty = true;*/
-        }
-
-        private ICommand rotateGrid90CCWCommand;
-        public ICommand RotateGrid90CCWCommand
-        {
-            get
-            {
-                if (rotateGrid90CCWCommand == null)
-                {
-                    rotateGrid90CCWCommand = new RelayCommand(RotateGrid90CCW);                    
-                }
-                return rotateGrid90CCWCommand;
-            }
-        }
-
-        private void RotateGrid90CCW()
-        {
-            /*Pixels.Reset(matrixOperationsService.RotateMatrix90CCW(Pixels.ToArray(), GridWidth, GridHeight));
-            int w = gridWidth;
-            int h = gridHeight;
-            gridWidth = h;
-            gridHeight = w;
-            OnPropertyChanged(nameof(GridHeight));
-            OnPropertyChanged(nameof(GridWidth));
-            OnPropertyChanged(nameof(PixelWidth));
-            AddHistoryState("Rotate Grid 90° CCW");
-            IsDirty = true;*/
-        }
-
-        private ICommand rotateGrid180Command;
-        public ICommand RotateGrid180Command
-        {
-            get
-            {
-                if (rotateGrid180Command == null)
-                {
-                    rotateGrid180Command = new RelayCommand(RotateGrid180);
-                }
-                return rotateGrid180Command;
-            }
-        }
-
-        private void RotateGrid180()
-        {
-            /*Pixels.Reset(matrixOperationsService.RotateMatrix180(Pixels.ToArray(), GridWidth, GridHeight));
-            AddHistoryState("Rotate Grid 180°");
-            IsDirty = true;*/
-        }
-
-        private ICommand flipGridVerticallyCommand;
-        public ICommand FlipGridVerticallyCommand
-        {
-            get
-            {
-                if (flipGridVerticallyCommand == null)
-                {
-                    flipGridVerticallyCommand = new RelayCommand(FlipGridVertically);
-                }
-                return flipGridVerticallyCommand;
-            }
-        }
-
-        private void FlipGridVertically()
-        {
-            /*Pixels.Reset(matrixOperationsService.FlipMatrixVertically(Pixels.ToArray(), GridWidth, GridHeight));
-            AddHistoryState("Flip Grid Vertically");
-            IsDirty = true;*/
-        }
-
-        private ICommand flipGridHorizontallyCommand;
-        public ICommand FlipGridHorizontallyCommand
-        {
-            get
-            {
-                if (flipGridHorizontallyCommand == null)
-                {
-                    flipGridHorizontallyCommand = new RelayCommand(FlipGridHorizontally);                    
-                }
-                return flipGridHorizontallyCommand;
-            }
-        }
-
-        private void FlipGridHorizontally()
-        {
-            /*Pixels.Reset(matrixOperationsService.FlipMatrixHorizontally(Pixels.ToArray(), GridWidth, GridHeight));
-            AddHistoryState("Flip Grid Horizontally");
-            IsDirty = true;*/
-        }
+        }                                       
 
         private ICommand openCanvasDialogCommand;
         public ICommand OpenCanvasDialogCommand
@@ -661,31 +410,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
 
         private void OpenCanvasDialog()
         {
-            /*var view = viewFactory.CreateView<ScaleCanvasView>();
-            var viewModel = (ScaleCanvasViewModel)view.DataContext;
-            viewModel.Setup(GridWidth, GridHeight);
-            view.ShowDialog();
-            if (!viewModel.ApplyChanges)
-                return;
-            if (GridWidth == viewModel.GridWidth && GridHeight == viewModel.GridHeight)
-                return;
-            int x = viewModel.PivotIndex % 3;
-            int y = viewModel.PivotIndex / 3;
-            Vector2Int normalizedPivot = new Vector2Int(x, y);
-            var newPixels = matrixOperationsService.ResizeMatrix(Pixels.ToArray(), GridWidth, GridHeight, viewModel.GridWidth, viewModel.GridHeight, normalizedPivot);
-            for (int i = 0; i < newPixels.Length; i++)
-            {
-                if (newPixels[i] == null)
-                    newPixels[i] = PixelEntry.Default;
-            }
-            gridWidth = viewModel.GridWidth;
-            gridHeight = viewModel.GridHeight;
-            Pixels.Reset(newPixels);
-            OnPropertyChanged(nameof(GridHeight));
-            OnPropertyChanged(nameof(GridWidth));
-            OnPropertyChanged(nameof(PixelWidth));
-            AddHistoryState("Resize Grid");
-            IsDirty = true;*/
+            viewModelFactory.CreateViewModel<IScaleCanvasViewModel>();
         }
 
         private void QuitApplication()

@@ -44,7 +44,7 @@
                     </MenuItem.Header>
                 </MenuItem>
                 <Separator/>
-				<MenuItem Command="{Binding SaveFileCommand}" IsEnabled="{Binding CanSave}">
+				<MenuItem Command="{Binding SaveSpriteCommand}">
                     <MenuItem.Icon>
                         <Image Source="/Resources/Save_16x.png"></Image>
                     </MenuItem.Icon>
@@ -59,7 +59,7 @@
                         </Grid>
                     </MenuItem.Header>
                 </MenuItem>
-				<MenuItem Command="{Binding SaveFileWithLocationCommand}" IsEnabled="{Binding IsDirty}">
+				<MenuItem Command="{Binding SaveSpriteWithLocationCommand}">
                     <MenuItem.Icon>
                         <Image Source="/Resources/Save_16x.png"></Image>
                     </MenuItem.Icon>

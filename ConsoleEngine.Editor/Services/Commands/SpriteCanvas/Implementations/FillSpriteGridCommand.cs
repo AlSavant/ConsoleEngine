@@ -1,6 +1,7 @@
-﻿using ConsoleEngine.Editor.Services.SpriteGrid;
+﻿using ConsoleEngine.Editor.Services.Commands.Implementations;
+using ConsoleEngine.Editor.Services.SpriteGrid;
 
-namespace ConsoleEngine.Editor.Services.Commands.Implementations
+namespace ConsoleEngine.Editor.Services.Commands.SpriteCanvas.Implementations
 {
     internal sealed class FillSpriteGridCommand : LogicCommand, IFillSpriteGridCommand
     {
@@ -21,11 +22,11 @@ namespace ConsoleEngine.Editor.Services.Commands.Implementations
         protected override void ExecuteCommand(object? parameter)
         {
             var color = spriteToolbarStateService.GetSelectedColor();
-            if(spriteToolbarStateService.CanPaintCharacters())
+            if (spriteToolbarStateService.CanPaintCharacters())
             {
                 var character = spriteToolbarStateService.GetSelectedCharacter();
                 canvasDrawingService.Fill(character, color);
-            }   
+            }
             else
             {
                 canvasDrawingService.ColorFill(color);

@@ -1,6 +1,7 @@
-﻿using ConsoleEngine.Editor.Services.SpriteGrid;
+﻿using ConsoleEngine.Editor.Services.Commands.Implementations;
+using ConsoleEngine.Editor.Services.SpriteGrid;
 
-namespace ConsoleEngine.Editor.Services.Commands.Implementations
+namespace ConsoleEngine.Editor.Services.Commands.SpriteCanvas.Implementations
 {
     internal sealed class ClearSpriteGridCommand : LogicCommand, IClearSpriteGridCommand
     {

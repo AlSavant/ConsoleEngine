@@ -1,6 +1,6 @@
 ﻿using ConsoleEngine.Editor.Model;
 using ConsoleEngine.Editor.Model.ComponentModel.Implementations;
-using ConsoleEngine.Editor.Services.Commands;
+using ConsoleEngine.Editor.Services.Commands.SpriteCanvas;
 using ConsoleEngine.Editor.Services.SpriteGrid;
 using DataModel.ComponentModel;
 using System.Collections.Generic;
@@ -82,6 +82,10 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             var pixels = (CanvasPixelsChangedEventArgs)args;
             foreach (var index in pixels.ChangedIndices)
             {
+                if (Pixels.Count <= index)
+                    continue;
+                if (index < 0)
+                    continue;
                 Pixels[index].Character = canvasDrawingService.Get(index).character;
                 Pixels[index].Color = canvasDrawingService.Get(index).colorEntry;
             }

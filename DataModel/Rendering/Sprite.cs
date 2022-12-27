@@ -1,10 +1,11 @@
-﻿using System;
+﻿using LiteNetLib.Utils;
+using System;
 using System.Numerics;
 
 namespace DataModel.Rendering
 {
     [Serializable]
-    public sealed class Sprite
+    public sealed class Sprite : INetSerializable
     {
         public bool isTransparent { get; set; }
         public int width { get; set; }
@@ -30,6 +31,24 @@ namespace DataModel.Rendering
             if (index < 0 || index >= characters.Length || index >= colors.Length)
                 return null;
             return new byte[] { characters[index], colors[index] };
+        }
+
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.Put(isTransparent);
+            writer.Put(width);
+            writer.Put(height);
+            writer.PutBytesWithLength(characters);
+            writer.PutBytesWithLength(colors);
+        }
+
+        public void Deserialize(NetDataReader reader)
+        {
+            isTransparent = reader.GetBool();
+            width = reader.GetInt();
+            height = reader.GetInt();
+            characters = reader.GetBytesWithLength();
+            colors = reader.GetBytesWithLength();
         }
     }
 }

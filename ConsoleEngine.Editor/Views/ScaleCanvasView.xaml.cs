@@ -10,6 +10,7 @@ namespace ConsoleEngine.Editor.Views
     {
         public ScaleCanvasView()
         {
+            DataContext = null;
             InitializeComponent();
         }
     }

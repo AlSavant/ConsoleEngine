@@ -75,16 +75,16 @@ namespace ConsoleEngine.Editor
                 if (shift)
                 {
                     //Save as...
-                    if (context.IsDirty)
-                        context.SaveFileWithLocationCommand.Execute(this);
+                    //if (context.IsDirty)
+                    //    context.SaveFileWithLocationCommand.Execute(this);
                 }
                 else
                 {
                     //Save
-                    if (context.CanSave)
-                        context.SaveFileCommand.Execute(this);
-                    else if (context.IsDirty)
-                        context.SaveFileWithLocationCommand.Execute(this);
+                    //if (context.CanSave)
+                    //    context.SaveFileCommand.Execute(this);
+                    //else if (context.IsDirty)
+                    //    context.SaveFileWithLocationCommand.Execute(this);
                 }
                 return;
             }

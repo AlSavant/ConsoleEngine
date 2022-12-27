@@ -31,6 +31,7 @@ namespace ConsoleEngine.Editor.Services.History.Actions.Implementations
             if (state == null)
                 return;
             spriteGridStateService.SetGridSize(state.NextGridSize);
+            canvasDrawingService.ApplyGridSize();
             canvasDrawingService.SetPixels(state.NextPixels);                     
         }        
 
@@ -39,6 +40,7 @@ namespace ConsoleEngine.Editor.Services.History.Actions.Implementations
             if (state == null)
                 return;
             spriteGridStateService.SetGridSize(state.PreviousGridSize);
+            canvasDrawingService.ApplyGridSize();
             canvasDrawingService.SetPixels(state.PreviousPixels);            
         }
     }

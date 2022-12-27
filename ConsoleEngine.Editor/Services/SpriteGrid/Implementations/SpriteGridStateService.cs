@@ -11,6 +11,20 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
         private Vector2Int gridSize = new Vector2Int(20, 20);
         private bool showGrid = true;
         private bool supportTransparency;
+        private bool isDirty = false;
+
+        public bool IsDirty()
+        {
+            return isDirty;
+        }
+
+        public void SetDirtyStatus(bool status)
+        {
+            if (isDirty == status)
+                return;
+            isDirty = status;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsDirty"));
+        }
 
         public Vector2Int GetGridSize()
         {

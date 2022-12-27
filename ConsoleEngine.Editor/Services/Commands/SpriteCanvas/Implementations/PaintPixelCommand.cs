@@ -1,8 +1,9 @@
 ﻿using ConsoleEngine.Editor.Model;
+using ConsoleEngine.Editor.Services.Commands.Implementations;
 using ConsoleEngine.Editor.Services.SpriteGrid;
 using System.Collections.Generic;
 
-namespace ConsoleEngine.Editor.Services.Commands.Implementations
+namespace ConsoleEngine.Editor.Services.Commands.SpriteCanvas.Implementations
 {
     internal sealed class PaintPixelCommand : LogicCommand<KeyValuePair<int, Pixel>>, IPaintPixelCommand
     {
