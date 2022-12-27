@@ -14,5 +14,6 @@ namespace ConsoleEngine.Editor.Services.History
         void AddHistoryAction<T1, T2>(T2 state) where T1 : IHistoryAction<T2> where T2 : HistoryState;
         void ApplyPreviousAction();
         void ApplyNextAction();
+        void ClearHistory();
     }
 }

@@ -59,8 +59,14 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
         public ICommand RotateGrid180Command { get; private set; }
         public ICommand FlipGridVerticallyCommand { get; private set; } 
         public ICommand FlipGridHorizontallyCommand { get; private set; }
+        public ICommand QuitApplicationCommand { get; private set; }
+        public ICommand OpenWithLocationCommand { get; private set; }
+        public ICommand OpenSpriteCommand { get; private set; }
 
         public SpriteEditorViewModel(
+            IOpenSpriteCommand openSpriteCommand,
+            IOpenSpriteWithLocationCommand openSpriteWithLocationCommand,
+            IQuitApplicationCommand quitApplicationCommand,
             ISaveSpriteWithLocationCommand saveSpriteWithLocationCommand,
             ISaveSpriteCommand saveSpriteCommand,
             ISpriteSavePathService spriteSavePathService,
@@ -87,6 +93,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             this.spriteGridStateService = spriteGridStateService;
             historyActionService.SetMaxActionBuffer(10);
 
+            QuitApplicationCommand = quitApplicationCommand;
             UndoCommand = undoActionCommand;
             RedoCommand = redoActionCommand;
             SaveSpriteCommand = saveSpriteCommand;
@@ -96,6 +103,8 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             RotateGrid180Command = rotateGrid180Command;
             FlipGridHorizontallyCommand = flipGridHorizontallyCommand;
             FlipGridVerticallyCommand = flipGridVerticallyCommand;
+            OpenSpriteCommand = openSpriteCommand;
+            OpenWithLocationCommand = openSpriteWithLocationCommand;
 
             historyActionService.PropertyChanged += OnHistoryActionChanged;
             spriteGridStateService.PropertyChanged += OnDirtyCanvasChanged;
@@ -231,169 +240,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             }
             spriteGridStateService.SetGridVisibility(true);            
             IsDirty = false;*/
-        }
-
-        private ICommand openWithLocationCommand;
-        public ICommand OpenWithLocationCommand
-        {
-            get
-            {
-                if (openWithLocationCommand == null)
-                {
-                    openWithLocationCommand = new RelayCommand<string>(OpenFileWithLocation);
-                }
-                return openWithLocationCommand;
-            }
-        }
-
-        private void OpenFileWithLocation(string? path)
-        {
-            if (path == null)
-                return;            
-            if (!File.Exists(path))
-            {
-                Properties.Settings.Default.RecentFiles.Remove(path);
-                RecentFiles.Remove(path);
-                Properties.Settings.Default.Save();
-                MessageBox.Show("The requested sprite file could not be found at the target location. Removing from list.", "Sprite not found", MessageBoxButton.OK);
-                OnPropertyChanged(nameof(RecentFiles));
-                OnPropertyChanged(nameof(CanBrowseRecents));
-                return;
-            }
-            var formatter = new BinaryFormatter();
-            var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.None);
-            var sprite = (Sprite)formatter.Deserialize(stream);
-            stream.Close();
-            ApplySprite(sprite);
-            spriteGridStateService.SetDirtyStatus(false);
-            //ImportedArt = string.Empty;
-            spriteSavePathService.SetCurrentSavePath(path);            
-
-            int idx = RecentFiles.IndexOf(path);
-            if (idx > 0)
-            {
-                for (int i = 0; i < idx; i++)
-                {
-                    string movedFile = RecentFiles[i];
-                    RecentFiles[i + 1] = movedFile;
-                    Properties.Settings.Default.RecentFiles[i + 1] = movedFile;
-                }
-                RecentFiles[0] = path;
-                Properties.Settings.Default.RecentFiles[0] = path;
-                Properties.Settings.Default.Save();
-                OnPropertyChanged(nameof(RecentFiles));
-            }
-        }
-
-        private ICommand openSpriteCommand;
-        public ICommand OpenSpriteCommand
-        {
-            get
-            {
-                if (openSpriteCommand == null)
-                {
-                    openSpriteCommand = new RelayCommand(OpenSprite);
-                }
-                return openSpriteCommand;
-            }
-        }
-
-        private void OpenSprite()
-        {
-            if (!DiscardChanges())
-                return;
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "Console Sprite (*.csp)|*.csp";
-            if (string.IsNullOrEmpty(spriteSavePathService.GetCurrentSavePath()))
-            {
-                openFileDialog.InitialDirectory = Environment.CurrentDirectory;
-            }
-            else
-            {
-                openFileDialog.InitialDirectory = Path.GetDirectoryName(spriteSavePathService.GetCurrentSavePath());
-            }
-            if (openFileDialog.ShowDialog() == true)
-            {
-                var filePath = openFileDialog.FileName;
-                var formatter = new BinaryFormatter();
-                var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.None);
-                var sprite = (Sprite)formatter.Deserialize(stream);
-                stream.Close();
-                ApplySprite(sprite);
-                spriteGridStateService.SetDirtyStatus(false);
-                //ImportedArt = string.Empty;
-                spriteSavePathService.SetCurrentSavePath(filePath);                
-
-                if (!RecentFiles.Contains(filePath))
-                {
-                    RecentFiles.Insert(0, filePath);
-                    Properties.Settings.Default.RecentFiles.Insert(0, filePath);
-                    if (RecentFiles.Count > 10)
-                    {
-                        RecentFiles.RemoveAt(10);
-                        Properties.Settings.Default.RecentFiles.RemoveAt(10);
-                    }
-                    Properties.Settings.Default.Save();
-                }
-                else
-                {
-                    int idx = RecentFiles.IndexOf(openFileDialog.FileName);
-                    if (idx > 0)
-                    {
-                        for (int i = 0; i < idx; i++)
-                        {
-                            string movedFile = RecentFiles[i];
-                            RecentFiles[i + 1] = movedFile;
-                            Properties.Settings.Default.RecentFiles[i + 1] = movedFile;
-                        }
-                        RecentFiles[0] = openFileDialog.FileName;
-                        Properties.Settings.Default.RecentFiles[0] = openFileDialog.FileName;
-                        Properties.Settings.Default.Save();                        
-                    }
-                }                
-            }
-        }
-
-        private void ApplySprite(Sprite sprite)
-        {
-            /*gridWidth = sprite.width;
-            gridHeight = sprite.height;
-            var pixels = new List<PixelEntry>(gridWidth * gridHeight);
-            for (int i = 0; i < gridWidth * gridHeight; i++)
-            {
-                pixels.Add(new PixelEntry());
-                var e = CodePagesEncodingProvider.Instance.GetEncoding(437);
-                var s = e.GetString(new byte[] { sprite.characters[i] });
-                pixels[i].Character = s[0];
-                pixels[i].Color = ColorEntry.FromConsoleColor((ConsoleColor)sprite.colors[i]);
-            }
-            Pixels.Reset(pixels);
-            spriteGridStateService.SetTransparencyMode(sprite.isTransparent);            
-            OnPropertyChanged(nameof(GridHeight));
-            OnPropertyChanged(nameof(GridWidth));
-            OnPropertyChanged(nameof(PixelWidth));*/
-        }
-
-        private bool DiscardChanges()
-        {
-            if (!spriteGridStateService.IsDirty())
-                return true;
-            var messageBoxResult = MessageBox.Show("You have pending unsaved changes. Do you wish to discard them?", "Discard Changes", MessageBoxButton.YesNo);
-            return messageBoxResult == MessageBoxResult.Yes;
-        }
-
-        private ICommand quitApplicationCommand;
-        public ICommand QuitApplicationCommand
-        {
-            get
-            {
-                if (quitApplicationCommand == null)
-                {
-                    quitApplicationCommand = new RelayCommand(QuitApplication);
-                }
-                return quitApplicationCommand;
-            }
-        }                                       
+        }                                                
 
         private ICommand openCanvasDialogCommand;
         public ICommand OpenCanvasDialogCommand
@@ -411,11 +258,6 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
         private void OpenCanvasDialog()
         {
             viewModelFactory.CreateViewModel<IScaleCanvasViewModel>();
-        }
-
-        private void QuitApplication()
-        {
-            Application.Current.Shutdown();
         }
     }
 }

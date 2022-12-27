@@ -6,6 +6,23 @@
         xmlns:views="clr-namespace:ConsoleEngine.Editor.Views"
         mc:Ignorable="d"
         Title="Sprite Editor" Height="600" Width="1000" Name="SpriteEditor" KeyDown="SpriteEditor_KeyDown">
+    <Window.InputBindings>
+        <KeyBinding Command="{Binding SaveSpriteCommand}" 
+                Key="S,s" 
+                Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding SaveSpriteWithLocationCommand}" 
+                Key="S,s" 
+                Modifiers="Ctrl+Shift"/>
+        <KeyBinding Command="{Binding UndoCommand}" 
+                Key="Z,z" 
+                Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding RedoCommand}" 
+                Key="Y,y" 
+                Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding OpenSpriteCommand}" 
+                Key="O,o" 
+                Modifiers="Ctrl"/>
+    </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>

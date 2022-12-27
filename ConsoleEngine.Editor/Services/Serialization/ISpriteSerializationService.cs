@@ -3,5 +3,6 @@
     internal interface ISpriteSerializationService : IService
     {
         byte[] SerializeSprite();
+        void DeserializeSprite(byte[] spriteBytes);
     }
 }

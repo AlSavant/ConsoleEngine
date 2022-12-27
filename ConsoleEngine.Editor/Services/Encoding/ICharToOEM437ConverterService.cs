@@ -4,5 +4,6 @@
     {
         char[] GetRegisteredCharacters();
         byte CharToByte(char character);
+        char ByteToChar(byte value);
     }
 }

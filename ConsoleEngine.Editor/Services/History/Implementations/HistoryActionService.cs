@@ -114,5 +114,12 @@ namespace ConsoleEngine.Editor.Services.History.Implementations
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HistoryChanged"));
             isChangingState = false;
         }
+
+        public void ClearHistory()
+        {
+            currentIndex = -1;
+            actions.Clear();
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HistoryChanged"));
+        }
     }
 }

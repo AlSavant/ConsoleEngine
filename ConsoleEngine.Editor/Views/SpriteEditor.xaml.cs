@@ -66,61 +66,14 @@ namespace ConsoleEngine.Editor
         {
             var ctrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
             if (!ctrl)
-                return;
-            var s = Keyboard.IsKeyDown(Key.S);
-            var shift = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
-            var context = (SpriteEditorViewModel)DataContext;
-            if (s)
-            {
-                if (shift)
-                {
-                    //Save as...
-                    //if (context.IsDirty)
-                    //    context.SaveFileWithLocationCommand.Execute(this);
-                }
-                else
-                {
-                    //Save
-                    //if (context.CanSave)
-                    //    context.SaveFileCommand.Execute(this);
-                    //else if (context.IsDirty)
-                    //    context.SaveFileWithLocationCommand.Execute(this);
-                }
-                return;
-            }
+                return;                        
+            var context = (SpriteEditorViewModel)DataContext;            
             var n = Keyboard.IsKeyDown(Key.N);
             if (n)
             {
                 context.NewSpriteCommand.Execute(this);
                 return;
-            }
-
-            var o = Keyboard.IsKeyDown(Key.O);
-            if (o)
-            {
-                context.OpenSpriteCommand.Execute(this);
-                return;
-            }
-
-            var z = Keyboard.IsKeyDown(Key.Z);
-            var y = Keyboard.IsKeyDown(Key.Y);
-            if (z)
-            {
-                //Undo
-                context.UndoCommand?.Execute(null);
-                context.UndoCommand?.NotifyCanExecuteChanged();
-                context.RedoCommand?.NotifyCanExecuteChanged();
-                return;
-            }
-            if (y)
-            {
-                //Redo
-                context.RedoCommand?.Execute(null);
-                context.UndoCommand?.NotifyCanExecuteChanged();
-                context.RedoCommand?.NotifyCanExecuteChanged();
-                return;
-            }
-
+            }          
         }        
     }
 }

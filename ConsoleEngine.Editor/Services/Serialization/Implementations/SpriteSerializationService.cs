@@ -1,8 +1,11 @@
-﻿using ConsoleEngine.Editor.Services.Encoding;
+﻿using ConsoleEngine.Editor.Model;
+using ConsoleEngine.Editor.Services.Encoding;
 using ConsoleEngine.Editor.Services.SpriteGrid;
+using DataModel.Math.Structures;
 using DataModel.Rendering;
 using LiteNetLib.Utils;
 using System;
+using System.Collections.Generic;
 
 namespace ConsoleEngine.Editor.Services.Serialization.Implementations
 {
@@ -43,6 +46,22 @@ namespace ConsoleEngine.Editor.Services.Serialization.Implementations
             var writer = new NetDataWriter();
             sprite.Serialize(writer);
             return writer.Data;
+        }
+
+        public void DeserializeSprite(byte[] spriteBytes)
+        {
+            var reader = new NetDataReader(spriteBytes);
+            var sprite = new Sprite();
+            sprite.Deserialize(reader);
+            spriteGridStateService.SetGridSize(new Vector2Int(sprite.width, sprite.height));
+            spriteGridStateService.SetTransparencyMode(sprite.isTransparent);
+            var pixels = new Dictionary<int, Pixel>();
+            for(int i = 0; i < sprite.colors.Length; i++)
+            {
+                var character = charToOEM437ConverterService.ByteToChar(sprite.characters[i]);
+                pixels.Add(i, new Pixel(character, ColorEntry.FromConsoleColor((ConsoleColor)sprite.colors[i])));
+            }
+            canvasDrawingService.SetPixels(pixels);
         }
     }
 }
