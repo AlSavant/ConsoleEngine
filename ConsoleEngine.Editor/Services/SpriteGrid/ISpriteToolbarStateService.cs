@@ -1,9 +1,12 @@
 ﻿using ConsoleEngine.Editor.Model;
+using DataModel.ComponentModel;
 
 namespace ConsoleEngine.Editor.Services.SpriteGrid
 {
-    internal interface ISpriteToolbarStateService : IService
+    internal interface ISpriteToolbarStateService : IService, INotifyPropertyChanged
     {
+        string? GetImportedArt();        
+        void SetImportedArt(string? importedArt);
         void SetCharacterPaintingState(bool enabled);
         bool CanPaintCharacters();
         void SelectColor(ColorEntry colorEntry);

@@ -1,5 +1,4 @@
 ﻿using ConsoleEngine.Editor.ViewModels;
-using ConsoleEngine.Editor.ViewModels.Implementations;
 using ConsoleEngine.Editor.Views;
 using System.Windows;
 using System.Windows.Controls;
@@ -59,21 +58,6 @@ namespace ConsoleEngine.Editor
             } while (currentParent != null);
 
             return foundParent;
-        }
-
-        //Shortcut detection
-        private void SpriteEditor_KeyDown(object sender, KeyEventArgs e)
-        {
-            var ctrl = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
-            if (!ctrl)
-                return;                        
-            var context = (SpriteEditorViewModel)DataContext;            
-            var n = Keyboard.IsKeyDown(Key.N);
-            if (n)
-            {
-                context.NewSpriteCommand.Execute(this);
-                return;
-            }          
-        }        
+        }           
     }
 }

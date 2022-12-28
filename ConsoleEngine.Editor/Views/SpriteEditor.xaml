@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"           
         xmlns:views="clr-namespace:ConsoleEngine.Editor.Views"
         mc:Ignorable="d"
-        Title="Sprite Editor" Height="600" Width="1000" Name="SpriteEditor" KeyDown="SpriteEditor_KeyDown">
+        Title="Sprite Editor" Height="600" Width="1000" Name="SpriteEditor">
     <Window.InputBindings>
         <KeyBinding Command="{Binding SaveSpriteCommand}" 
                 Key="S,s" 
@@ -21,6 +21,9 @@
                 Modifiers="Ctrl"/>
         <KeyBinding Command="{Binding OpenSpriteCommand}" 
                 Key="O,o" 
+                Modifiers="Ctrl"/>
+        <KeyBinding Command="{Binding NewSpriteCommand}" 
+                Key="N,n" 
                 Modifiers="Ctrl"/>
     </Window.InputBindings>
     <Grid>

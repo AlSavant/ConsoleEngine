@@ -1,5 +1,6 @@
 ﻿using ConsoleEngine.Editor.Model;
 using ConsoleEngine.Editor.Model.ComponentModel.Implementations;
+using ConsoleEngine.Editor.Services.Commands;
 using ConsoleEngine.Editor.Services.Commands.SpriteCanvas;
 using ConsoleEngine.Editor.Services.SpriteGrid;
 using DataModel.ComponentModel;
@@ -18,8 +19,10 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
         public ICommand PaintPixelCommand { get; private set; }
         public ICommand ClearCommand { get; private set; }
         public ICommand FillCommand { get; private set; }
+        public ILogicCommand ImportArtCommand { get; private set; }
 
         public SpriteGridViewModel(
+            IImportArtCommand importArtCommand,
             ISpriteToolbarStateService spriteToolbarStateService,
             ISpriteGridStateService spriteGridStateService, 
             ICanvasDrawingService canvasDrawingService,
@@ -34,9 +37,11 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             PaintPixelCommand = paintPixelCommand;
             ClearCommand = clearSpriteGridCommand;
             FillCommand = fillSpriteGridCommand;
+            ImportArtCommand = importArtCommand;
             spriteGridStateService.PropertyChanged += OnGridSizeChangedEvent;
             canvasDrawingService.PropertyChanged += OnPixelsChangedEvent;
             spriteGridStateService.PropertyChanged += OnGridVisibilityChanged;
+            spriteToolbarStateService.PropertyChanged += OnImportedArtChanged;
             canvasDrawingService.ApplyGridSize();
         }
 
@@ -58,6 +63,14 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             return new KeyValuePair<int, Pixel>(index, new Pixel(
                     character, 
                     spriteToolbarStateService.GetSelectedColor()));
+        }
+
+        private void OnImportedArtChanged(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
+        {
+            if (args.PropertyName != "Imported Art")
+                return;
+            OnPropertyChanged(nameof(ImportedArt));
+            ImportArtCommand.NotifyCanExecuteChanged();
         }
 
         private void OnGridVisibilityChanged(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
@@ -185,7 +198,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                 {
                     spriteGridStateService.SetTransparencyMode(value);
                     OnPropertyChanged(nameof(SupportsTransparency));
-                    //IsDirty = true;
+                    spriteGridStateService.SetDirtyStatus(true);                    
                 }
             }
         }
@@ -206,18 +219,22 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                 }
             }
         }        
-
-        private string importedArt;
-        public string ImportedArt
+        
+        public string? ImportedArt
         {
             get
             {
-                return importedArt;
+                return spriteToolbarStateService.GetImportedArt();
             }
             set
             {
-                SetProperty(ref importedArt, value, nameof(ImportedArt));
+                if(value != spriteToolbarStateService.GetImportedArt())
+                {
+                    spriteToolbarStateService.SetImportedArt(value);
+                    OnPropertyChanged(nameof(ImportedArt));
+                    ImportArtCommand.NotifyCanExecuteChanged();
+                }                
             }
-        }
+        }                 
     }
 }

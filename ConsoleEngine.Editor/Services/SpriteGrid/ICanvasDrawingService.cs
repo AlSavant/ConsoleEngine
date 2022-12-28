@@ -21,5 +21,6 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid
         void Rotate90CW();
         void Rotate90CCW();
         void Resize(Vector2Int newSize, Vector2Int pivot);
+        void ImportArt(string param);
     }
 }

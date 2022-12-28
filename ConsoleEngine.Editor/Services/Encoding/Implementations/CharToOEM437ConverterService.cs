@@ -8,12 +8,12 @@ namespace ConsoleEngine.Editor.Services.Encoding.Implementations
     {
         private readonly Dictionary<char, byte> characterMap;
         private readonly char[] registeredCharacters;
-        private readonly System.Text.Encoding encoding;
+        private readonly System.Text.Encoding? encoding;
 
         public CharToOEM437ConverterService()
         {
             characterMap = new Dictionary<char, byte>();            
-            encoding = CodePagesEncodingProvider.Instance.GetEncoding(437)!;
+            encoding = CodePagesEncodingProvider.Instance.GetEncoding(437);
             if(encoding == null)
             {
                 throw new InvalidOperationException("Could not resolve OEM 437 Encoding.");
@@ -39,6 +39,11 @@ namespace ConsoleEngine.Editor.Services.Encoding.Implementations
             registeredCharacters = characters.ToArray();
         }
 
+        public bool IsValidChar(char character)
+        {
+            return characterMap.ContainsKey(character);
+        }
+
         public char[] GetRegisteredCharacters()
         {
             return registeredCharacters;
@@ -53,7 +58,13 @@ namespace ConsoleEngine.Editor.Services.Encoding.Implementations
 
         public char ByteToChar(byte value)
         {            
-            var s = encoding.GetString(new byte[] { value });
+            var s = encoding?.GetString(new byte[] { value });
+            return s[0];
+        }
+
+        public char GetInvalidCharacter()
+        {
+            var s = encoding?.GetString(new byte[] { 32 });
             return s[0];
         }
     }

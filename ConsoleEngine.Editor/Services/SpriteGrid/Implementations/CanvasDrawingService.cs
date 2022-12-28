@@ -4,6 +4,7 @@ using ConsoleEngine.Editor.Model.History;
 using ConsoleEngine.Editor.Services.History;
 using ConsoleEngine.Editor.Services.History.Actions;
 using ConsoleEngine.Editor.Services.Util;
+using ConsoleEngine.Editor.Services.Encoding;
 using DataModel.ComponentModel;
 using DataModel.Math.Structures;
 using System;
@@ -20,12 +21,18 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
         private readonly ISpriteGridStateService spriteGridStateService;
         private readonly IHistoryActionService historyActionService;
         private readonly IMatrixOperationsService matrixOperationsService;
+        private readonly ICharToOEM437ConverterService charToOEM437ConverterService;
+        private readonly ISpriteToolbarStateService spriteToolbarStateService;
 
         public CanvasDrawingService(
+            ISpriteToolbarStateService spriteToolbarStateService,
+            ICharToOEM437ConverterService charToOEM437ConverterService,
             ISpriteGridStateService spriteGridStateService, 
             IHistoryActionService historyActionService,
             IMatrixOperationsService matrixOperationsService)
         {
+            this.spriteToolbarStateService = spriteToolbarStateService;
+            this.charToOEM437ConverterService = charToOEM437ConverterService;
             this.spriteGridStateService = spriteGridStateService;
             this.historyActionService = historyActionService;
             this.matrixOperationsService = matrixOperationsService;
@@ -307,5 +314,86 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
             }
             return dict;            
         }
+
+        public void ImportArt(string param)
+        {
+            var currentSize = spriteGridStateService.GetGridSize();
+            var lines = param.Split('\n');
+            var gridHeight = lines.Length;
+            var ordered = lines.OrderByDescending(x => x.Length);
+            int leftPad = lines.Length <= 1 ? 0 : -1;
+            var gridWidth = ordered.First().Length + leftPad;
+            var oldPixels = pixels;
+            pixels = new Pixel[gridHeight * gridWidth];
+            var dict = new Dictionary<int, KeyValuePair<Pixel, Pixel>>();
+
+            for (int y = 0; y < lines.Length; y++)
+            {
+                var line = lines[y];
+                for (int x = 0; x < gridWidth; x++)
+                {
+                    if (x >= line.Length)
+                        continue;
+                    var index = y * gridWidth + x;
+                    var oldPixel = new Pixel();
+                    if(index < oldPixels.Length)
+                        oldPixel = oldPixels[index];
+                    var pixel = new Pixel();
+                    if (charToOEM437ConverterService.IsValidChar(line[x]))
+                    {
+                        pixel.character = line[x];
+                        pixel.colorEntry = spriteToolbarStateService.GetSelectedColor();
+                    }
+                    else
+                    {
+                        pixel.character = charToOEM437ConverterService.GetInvalidCharacter();
+                        pixel.colorEntry = ColorEntry.FromConsoleColor(ConsoleColor.Black);
+                    }
+                    if(SetPixelNoBroadcast(index, pixel.character, pixel.colorEntry))
+                    {
+                        dict.Add(index, new KeyValuePair<Pixel, Pixel>(oldPixel, pixel));
+                    }                    
+                }
+            }
+
+
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                if (dict.ContainsKey(i))
+                    continue;
+                var previousPixel = default(Pixel);
+                if (i < oldPixels.Length)
+                {
+                    previousPixel = oldPixels[i];
+                    dict.Add(i, new KeyValuePair<Pixel, Pixel>(previousPixel, pixels[i]));
+                    continue;
+                }
+
+                if (SetPixelNoBroadcast(i, pixels[i].character, pixels[i].colorEntry))
+                {
+                    var currentPixel = pixels[i];
+                    dict.Add(i, new KeyValuePair<Pixel, Pixel>(previousPixel, currentPixel));
+                }
+            }
+            for (int i = pixels.Length; i < oldPixels.Length; i++)
+            {
+                if (dict.ContainsKey(i))
+                    continue;
+                var previousPixel = oldPixels[i];
+                var newPixel = default(Pixel);
+                dict.Add(i, new KeyValuePair<Pixel, Pixel>(previousPixel, newPixel));
+            }            
+            
+            if (dict.Count > 0)
+            {                
+                var newSize = new Vector2Int(gridWidth, gridHeight);
+                spriteGridStateService.SetGridSize(newSize);
+                spriteGridStateService.SetDirtyStatus(true);
+                var state = new PixelsPaintedState("Import Art", dict, new KeyValuePair<Vector2Int, Vector2Int>(currentSize, newSize));
+                historyActionService.AddHistoryAction<IPixelsPaintedAction, PixelsPaintedState>(state);
+                PropertyChanged?.Invoke(this, new CanvasPixelsChangedEventArgs("Pixels", dict.Keys.ToArray()));
+            }
+            spriteToolbarStateService.SetImportedArt(string.Empty);
+        } 
     }
 }
