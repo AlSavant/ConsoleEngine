@@ -25,6 +25,17 @@ namespace ConsoleEngine.Editor.Views
             if (command == null)
                 return;
             command.Execute(((Button)sender)?.DataContext);
-        }                       
+        }
+
+        private void OnGridExited(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            var context = (SpriteGridViewModel)DataContext;
+            if (context == null)
+                return;
+            var command = (IPaintPixelCommand)context.PaintPixelCommand;
+            if (command == null)
+                return;
+            command.Execute(null);
+        }
     }
 }

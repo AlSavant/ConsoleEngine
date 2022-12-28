@@ -9,20 +9,21 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
-            <RowDefinition/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0">
             <CheckBox Content="Show Grid" Margin="5,5,5,5" IsChecked="{Binding ShowGrid}"></CheckBox>
             <Button Width="40" Margin="5,5,5,5" FontSize="9" Content="Fill" Command="{Binding FillCommand}"/>
             <Button Width="40" Margin="2,5,5,5" FontSize="9" Content="Clear" Command="{Binding ClearCommand}"/>
-            <CheckBox Content="Is Transparent" Margin="5,5,0,5" IsChecked="{Binding SupportsTransparency}"></CheckBox>
+            <CheckBox Content="Black is Transparency" Margin="5,5,0,5" IsChecked="{Binding SupportsTransparency}"></CheckBox>
             <Button DockPanel.Dock="Right" Content="Import" Margin="5,5,5,5" FontSize="9" Width="50" Command="{Binding ImportArtCommand}" CommandParameter="{Binding Text, ElementName=ImportedArtTextbox}"></Button>
             <TextBox Name="ImportedArtTextbox" DockPanel.Dock="Right" HorizontalAlignment="Right" MaxLines="1" Width="200" Margin="0,5,0,5" Text="{Binding ImportedArt, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" TextWrapping="Wrap" AcceptsReturn="True" AcceptsTab="True"/>
             <Label HorizontalAlignment="Right" DockPanel.Dock="Right" Content="ASCII Art" Margin="5,0,0,0"/>
         </DockPanel>
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-            <Grid Width="{Binding PixelWidth}" Height="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+            <Grid Width="{Binding PixelWidth}" Height="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollBarVisibility="Auto" MouseLeave="OnGridExited">
                 <ListView ItemsSource="{Binding Pixels}" ScrollViewer.VerticalScrollBarVisibility="Hidden" ScrollViewer.HorizontalScrollBarVisibility="Hidden" HorizontalContentAlignment="Center" VerticalAlignment="Center" Cursor="Hand">
                     <ListView.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -45,5 +46,8 @@
                 </ListView>
             </Grid>
         </ScrollViewer>
+        <DockPanel Grid.Row="2">
+            <TextBlock Name="Coordinates" DockPanel.Dock="Right" HorizontalAlignment="Right" Margin="5,5,5,5" Text="{Binding HoveredCoordinates}"/>
+        </DockPanel>
     </Grid>
 </UserControl>

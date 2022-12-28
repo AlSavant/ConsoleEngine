@@ -9,9 +9,29 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
         public Action<INotifyPropertyChanged, IPropertyChangedEventArgs>? PropertyChanged { get; set; }
 
         private Vector2Int gridSize = new Vector2Int(20, 20);
-        private bool showGrid = true;
+        private bool showGrid = false;
         private bool supportTransparency;
         private bool isDirty = false;
+
+        private int hoveredPixelIndex = -1;
+
+        public void SetHoveredPixel(int index)
+        {
+            if(hoveredPixelIndex != index)
+            {
+                hoveredPixelIndex = index;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("HoveredPixel"));
+            }
+            
+        }
+
+        public Vector2Int GetHoveredPixel()
+        {
+            var length = gridSize.x * gridSize.y;
+            if (hoveredPixelIndex < 0 || hoveredPixelIndex > length)
+                return -Vector2Int.one;
+            return new Vector2Int((hoveredPixelIndex % gridSize.x) + 1, (hoveredPixelIndex / gridSize.x) + 1);
+        }
 
         public bool IsDirty()
         {

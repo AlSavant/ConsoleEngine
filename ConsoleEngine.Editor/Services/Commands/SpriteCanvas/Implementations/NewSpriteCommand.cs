@@ -33,7 +33,7 @@ namespace ConsoleEngine.Editor.Services.Commands.SpriteCanvas.Implementations
                 return;
             spriteGridStateService.SetGridSize(new Vector2Int(20, 20));
             canvasDrawingService.Clear();
-            spriteGridStateService.SetGridVisibility(true);
+            spriteGridStateService.SetGridVisibility(false);
             spriteGridStateService.SetDirtyStatus(false);
             historyActionService.ClearHistory();
         }

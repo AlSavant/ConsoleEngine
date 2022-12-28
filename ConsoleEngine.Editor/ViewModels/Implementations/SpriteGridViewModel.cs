@@ -4,6 +4,7 @@ using ConsoleEngine.Editor.Services.Commands;
 using ConsoleEngine.Editor.Services.Commands.SpriteCanvas;
 using ConsoleEngine.Editor.Services.SpriteGrid;
 using DataModel.ComponentModel;
+using DataModel.Math.Structures;
 using System.Collections.Generic;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -42,13 +43,14 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             canvasDrawingService.PropertyChanged += OnPixelsChangedEvent;
             spriteGridStateService.PropertyChanged += OnGridVisibilityChanged;
             spriteToolbarStateService.PropertyChanged += OnImportedArtChanged;
+            spriteGridStateService.PropertyChanged += OnHoveredPixelChanged;
             canvasDrawingService.ApplyGridSize();
         }
 
         private KeyValuePair<int, Pixel> PaintPixelParameterResolver(object? binding)
         {
             if (binding == null)
-                return default;
+                return new KeyValuePair<int, Pixel>(-1, default);
             var pixelEntry = (PixelViewModel)binding;
             if (pixelEntry == null)
                 return default;
@@ -63,6 +65,13 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             return new KeyValuePair<int, Pixel>(index, new Pixel(
                     character, 
                     spriteToolbarStateService.GetSelectedColor()));
+        }
+
+        private void OnHoveredPixelChanged(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
+        {
+            if (args.PropertyName != "HoveredPixel")
+                return;
+            OnPropertyChanged(nameof(HoveredCoordinates));            
         }
 
         private void OnImportedArtChanged(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
@@ -131,6 +140,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             OnPropertyChanged(nameof(GridWidth));
             OnPropertyChanged(nameof(GridHeight));
             OnPropertyChanged(nameof(PixelWidth));
+            OnPropertyChanged(nameof(HoveredCoordinates));
         }
 
         public int GridWidth
@@ -146,6 +156,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                     spriteGridStateService.SetGridWidth(value);
                     OnPropertyChanged(nameof(GridWidth));
                     OnPropertyChanged(nameof(PixelWidth));
+                    OnPropertyChanged(nameof(HoveredCoordinates));
                 }
             }
         }
@@ -162,6 +173,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                 {
                     spriteGridStateService.SetGridHeight(value);
                     OnPropertyChanged(nameof(GridHeight));
+                    OnPropertyChanged(nameof(HoveredCoordinates));
                 }
             }
         }
@@ -235,6 +247,19 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                     ImportArtCommand.NotifyCanExecuteChanged();
                 }                
             }
-        }                 
+        }  
+        
+        public string HoveredCoordinates
+        {
+            get
+            {
+                var pixelCoords = spriteGridStateService.GetHoveredPixel();
+                if (pixelCoords == -Vector2Int.one)
+                {
+                    return string.Empty;
+                }
+                return $"X : {pixelCoords.x} | Y : {pixelCoords.y}";
+            }
+        }
     }
 }

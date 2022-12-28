@@ -26,6 +26,7 @@ namespace ConsoleEngine.Editor.Services.Commands.SpriteCanvas.Implementations
         {
             if(Mouse.LeftButton == MouseButtonState.Pressed)
                 canvasDrawingService.SetPixel(param.Key, param.Value.character, param.Value.colorEntry);
+            spriteGridStateService.SetHoveredPixel(param.Key);
         }
     }
 }

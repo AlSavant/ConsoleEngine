@@ -6,6 +6,8 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid
     internal interface ISpriteGridStateService : IService, INotifyPropertyChanged
     {        
         Vector2Int GetGridSize();
+        Vector2Int GetHoveredPixel();
+        void SetHoveredPixel(int index);
         int GetGridWidth();
         int GetGridHeight();
         bool CanShowGrid();
