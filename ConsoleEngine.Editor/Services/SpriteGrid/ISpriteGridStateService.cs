@@ -4,7 +4,7 @@ using DataModel.Math.Structures;
 namespace ConsoleEngine.Editor.Services.SpriteGrid
 {
     internal interface ISpriteGridStateService : IService, INotifyPropertyChanged
-    {
+    {        
         Vector2Int GetGridSize();
         int GetGridWidth();
         int GetGridHeight();

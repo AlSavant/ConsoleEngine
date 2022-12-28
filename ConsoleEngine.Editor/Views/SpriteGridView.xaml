@@ -31,7 +31,7 @@
                     </ListView.ItemsPanel>
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Button BorderBrush="Black" Background="Black" Foreground="{Binding Color.MediaColor}" Content="{Binding Character}" Width="20" Height="20" Command="{Binding ElementName=SpriteGrid, Path=DataContext.PaintPixelCommand}" CommandParameter="{Binding}"/>
+                            <Button BorderBrush="Black" Background="Black" Foreground="{Binding Color.MediaColor}" Content="{Binding Character}" Width="20" Height="20" Command="{Binding ElementName=SpriteGrid, Path=DataContext.PaintPixelCommand}" CommandParameter="{Binding}" Focusable="False" IsTabStop="False" ClickMode="Hover" MouseLeftButtonDown="OnGridCellClicked"/>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                     <ListView.ItemContainerStyle>
