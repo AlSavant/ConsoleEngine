@@ -7,64 +7,93 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="125">
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="150"/>
-        </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <GroupBox Header="Characters">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="20"/>
-                        <RowDefinition/>
-                    </Grid.RowDefinitions>
-                    <CheckBox Content="Paint Characters" IsChecked="{Binding CanPaintCharacters, Mode=TwoWay}"></CheckBox>
-                    <ListBox IsEnabled="{Binding CanPaintCharacters}" Grid.Row="1" ItemsSource="{Binding CharacterList}" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectedIndex="{Binding SelectedCharacterIndex, Mode=TwoWay}" Cursor="Hand">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="125"/>
+            <ColumnDefinition Width="40"/>
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="150"/>
+            </Grid.RowDefinitions>
+            <Grid Grid.Row="0">
+                <GroupBox Header="Characters">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="20"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <CheckBox Content="Paint Characters" IsChecked="{Binding CanPaintCharacters, Mode=TwoWay}"></CheckBox>
+                        <ListBox IsEnabled="{Binding CanPaintCharacters}" Grid.Row="1" ItemsSource="{Binding CharacterList}" ScrollViewer.VerticalScrollBarVisibility="Auto" SelectedIndex="{Binding SelectedCharacterIndex, Mode=TwoWay}" Cursor="Hand">
+                            <ListBox.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Columns="3" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                </ItemsPanelTemplate>
+                            </ListBox.ItemsPanel>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <ListBoxItem Background="LightGray" IsHitTestVisible="False" Width="20" Height="20" Content="{Binding}"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem">
+                                    <Setter Property="Padding" Value="5,0,0,0"/>
+                                    <Setter Property="Margin" Value="0"/>
+                                    <Setter Property="Width" Value="30"/>
+                                    <Setter Property="Height" Value="30"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+            <Grid Grid.Row="1">
+                <GroupBox Header="Color Palette">
+                    <ListBox ItemsSource="{Binding ColorList}" SelectedIndex="{Binding SelectedColorIndex, Mode=TwoWay}" Cursor="Hand">
                         <ListBox.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <UniformGrid Columns="3" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+                                <UniformGrid Rows="4" Columns="4" HorizontalAlignment="Left"/>
                             </ItemsPanelTemplate>
                         </ListBox.ItemsPanel>
                         <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <ListBoxItem Background="LightGray" IsHitTestVisible="False" Width="20" Height="20" Content="{Binding}"/>
+                            <DataTemplate DataType="{x:Type models:ColorEntry}">
+                                <ListBoxItem Background="{Binding MediaColor}" IsHitTestVisible="False" Width="25" Height="25"/>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                         <ListBox.ItemContainerStyle>
                             <Style TargetType="ListBoxItem">
-                                <Setter Property="Padding" Value="5,0,0,0"/>
+                                <Setter Property="Padding" Value="0,0,0,0"/>
                                 <Setter Property="Margin" Value="0"/>
-                                <Setter Property="Width" Value="30"/>
-                                <Setter Property="Height" Value="30"/>
+                                <Setter Property="Width" Value="24"/>
+                                <Setter Property="Height" Value="24"/>
                             </Style>
                         </ListBox.ItemContainerStyle>
                     </ListBox>
-                </Grid>
-            </GroupBox>
+                </GroupBox>
+            </Grid>
         </Grid>
-        <Grid Grid.Row="1">
-            <GroupBox Header="Color Palette">
-                <ListBox ItemsSource="{Binding ColorList}" SelectedIndex="{Binding SelectedColorIndex, Mode=TwoWay}" Cursor="Hand">
-                    <ListBox.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <UniformGrid Rows="4" Columns="4" HorizontalAlignment="Left"/>
-                        </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="{x:Type models:ColorEntry}">
-                            <ListBoxItem Background="{Binding MediaColor}" IsHitTestVisible="False" Width="25" Height="25"/>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="ListBoxItem">
-                            <Setter Property="Padding" Value="0,0,0,0"/>
-                            <Setter Property="Margin" Value="0"/>
-                            <Setter Property="Width" Value="24"/>
-                            <Setter Property="Height" Value="24"/>
-                        </Style>
-                    </ListBox.ItemContainerStyle>
+        <Grid Grid.Column="1">
+            <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="5" Margin="0,8,0,1" VerticalAlignment="Top">
+                <ListBox ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.Items>
+                        <Button Width="25" Height="25" Margin="-1,0,0,0">
+                            <Button.Background>
+                                <ImageBrush ImageSource="/Resources/brush.png"/>
+                            </Button.Background>
+                        </Button>
+                        <Button Width="25" Height="25" Margin="-1,0,0,0">
+                            <Button.Background>
+                                <ImageBrush ImageSource="/Resources/bucket.png"/>
+                            </Button.Background>
+                        </Button>
+                        <Button Width="25" Height="25" Margin="-1,0,0,0">
+                            <Button.Background>
+                                <ImageBrush ImageSource="/Resources/line.png"/>
+                            </Button.Background>
+                        </Button>
+                    </ListBox.Items>
                 </ListBox>
-            </GroupBox>
+            </Border>
         </Grid>
     </Grid>
 </UserControl>

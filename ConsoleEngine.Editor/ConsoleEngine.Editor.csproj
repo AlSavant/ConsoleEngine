@@ -8,6 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\brush.png" />
+    <None Remove="Resources\bucket.png" />
+    <None Remove="Resources\line.png" />
     <None Remove="Resources\NewFile_16x.png" />
     <None Remove="Resources\OpenFolder_16x.png" />
     <None Remove="Resources\Redo_16x.png" />
@@ -22,6 +25,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\brush.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\bucket.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\line.png" />
     <Resource Include="Resources\NewFile_16x.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
