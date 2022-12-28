@@ -10,6 +10,7 @@ using System.Windows.Input;
 using ConsoleEngine.Editor.Services.Commands.SpriteCanvas;
 using ConsoleEngine.Editor.Services.IO;
 using ConsoleEngine.Editor.Services.Commands.Serialization;
+using System.IO;
 
 namespace ConsoleEngine.Editor.ViewModels.Implementations
 {
@@ -24,6 +25,21 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
                 return RecentFiles.Count > 0;
             }
         }        
+
+        public string WindowTitle
+        {
+            get
+            {
+                var title = "Sprite Editor";
+                var currentPath = spriteSavePathService.GetCurrentSavePath();
+                string fileName = "New Sprite";
+                if (!string.IsNullOrEmpty(currentPath)) 
+                {
+                    fileName = Path.GetFileNameWithoutExtension(currentPath);
+                }                
+                return $"{title} - {fileName}";
+            }
+        }
 
         private readonly IViewModelFactory viewModelFactory;
         private readonly IHistoryActionService historyActionService;
@@ -84,8 +100,14 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
 
             historyActionService.PropertyChanged += OnHistoryActionChanged;
             spriteGridStateService.PropertyChanged += OnDirtyCanvasChanged;
+            spriteSavePathService.PropertyChanged += OnCurrentSavePathChanged;
             RecentFiles.CollectionChanged += OnRecentFilesChanged;           
         }       
+
+        private void OnCurrentSavePathChanged(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
+        {
+            OnPropertyChanged(nameof(WindowTitle));
+        }
 
         private void OnHistoryActionChanged(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
         {

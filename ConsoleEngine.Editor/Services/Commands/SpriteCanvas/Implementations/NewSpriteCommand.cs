@@ -1,5 +1,6 @@
 ﻿using ConsoleEngine.Editor.Services.Commands.Implementations;
 using ConsoleEngine.Editor.Services.History;
+using ConsoleEngine.Editor.Services.IO;
 using ConsoleEngine.Editor.Services.SpriteGrid;
 using DataModel.Math.Structures;
 using System.Windows;
@@ -11,12 +12,15 @@ namespace ConsoleEngine.Editor.Services.Commands.SpriteCanvas.Implementations
         private readonly ISpriteGridStateService spriteGridStateService;
         private readonly ICanvasDrawingService canvasDrawingService;
         private readonly IHistoryActionService historyActionService;
+        private readonly ISpriteSavePathService spriteSavePathService;
 
         public NewSpriteCommand(
+            ISpriteSavePathService spriteSavePathService,
             ISpriteGridStateService spriteGridStateService, 
             ICanvasDrawingService canvasDrawingService, 
             IHistoryActionService historyActionService)
         {
+            this.spriteSavePathService = spriteSavePathService;
             this.spriteGridStateService = spriteGridStateService;
             this.canvasDrawingService = canvasDrawingService;
             this.historyActionService = historyActionService;
@@ -36,6 +40,7 @@ namespace ConsoleEngine.Editor.Services.Commands.SpriteCanvas.Implementations
             spriteGridStateService.SetGridVisibility(false);
             spriteGridStateService.SetDirtyStatus(false);
             historyActionService.ClearHistory();
+            spriteSavePathService.SetCurrentSavePath(string.Empty);
         }
 
         private bool DiscardChanges()

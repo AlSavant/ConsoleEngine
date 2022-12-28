@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using DataModel.ComponentModel;
+using System;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 
@@ -6,7 +8,10 @@ namespace ConsoleEngine.Editor.Services.IO.Implementations
 {
     internal sealed class SpriteSavePathService : ISpriteSavePathService
     {
-        public ObservableCollection<string> RecentFiles { get; private set; }
+        public Action<INotifyPropertyChanged, IPropertyChangedEventArgs>? PropertyChanged { get; set; }
+
+        public ObservableCollection<string> RecentFiles { get; private set; }        
+
         private string? currentSavePath;
 
         public string? GetCurrentSavePath()
@@ -16,7 +21,11 @@ namespace ConsoleEngine.Editor.Services.IO.Implementations
 
         public void SetCurrentSavePath(string? savePath)
         {
-            currentSavePath = savePath;
+            if(savePath != currentSavePath)
+            {
+                currentSavePath = savePath;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CurrentSavePath"));
+            }            
         }
 
         public SpriteSavePathService()
