@@ -8,10 +8,26 @@ namespace ConsoleEngine.Editor.Services.SpriteGrid.Implementations
     {
         public Action<INotifyPropertyChanged, IPropertyChangedEventArgs>? PropertyChanged { get; set; }
 
+        private ESpriteToolPreset selectedToolPreset;
         private bool canPaintCharacters = true;
         private ColorEntry selectedColor;
         private char selectedCharacter;
         private string? importedArt;        
+
+        public ESpriteToolPreset GetSelectedToolPreset()
+        {
+            return selectedToolPreset;
+        }
+
+        public void SelectToolPreset(ESpriteToolPreset preset)
+        {
+            if(selectedToolPreset != preset)
+            {
+                selectedToolPreset = preset;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("SelectedToolPreset"));
+            }
+            
+        }
 
         public string? GetImportedArt()
         {

@@ -10,12 +10,21 @@
   <ItemGroup>
     <None Remove="Resources\brush.png" />
     <None Remove="Resources\bucket.png" />
+    <None Remove="Resources\Cursors\brush.cur" />
+    <None Remove="Resources\Cursors\bucket.cur" />
     <None Remove="Resources\line.png" />
     <None Remove="Resources\NewFile_16x.png" />
     <None Remove="Resources\OpenFolder_16x.png" />
     <None Remove="Resources\Redo_16x.png" />
     <None Remove="Resources\Save_16x.png" />
+    <None Remove="Resources\selection.png" />
     <None Remove="Resources\Undo_16x.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Resources\Cursors\brush.cur">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>
@@ -31,6 +40,9 @@
     <Resource Include="Resources\bucket.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
+    <Resource Include="Resources\Cursors\bucket.cur">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
     <Resource Include="Resources\line.png" />
     <Resource Include="Resources\NewFile_16x.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
@@ -42,6 +54,9 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Save_16x.png">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\selection.png">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </Resource>
     <Resource Include="Resources\Undo_16x.png">

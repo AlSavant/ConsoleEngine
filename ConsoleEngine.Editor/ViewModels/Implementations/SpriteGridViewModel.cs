@@ -16,6 +16,28 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
         private readonly ISpriteGridStateService spriteGridStateService;
         private readonly ICanvasDrawingService canvasDrawingService;
         private readonly ISpriteToolbarStateService spriteToolbarStateService;
+       
+        public string? CanvasCursor
+        {
+            get
+            {    
+                switch(spriteToolbarStateService.GetSelectedToolPreset())
+                {
+                    case ESpriteToolPreset.Line:
+                    case ESpriteToolPreset.Paint:
+                        return $"/Resources/Cursors/brush.cur";
+
+                    case ESpriteToolPreset.Bucket:
+                        return $"/Resources/Cursors/bucket.cur";
+
+                    case ESpriteToolPreset.Selection:
+                        return "Cross";
+
+                    default:
+                        return "Arrow";
+                }                
+            }
+        }
 
         public ICommand PaintPixelCommand { get; private set; }
         public ICommand ClearCommand { get; private set; }
@@ -43,6 +65,7 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             canvasDrawingService.PropertyChanged += OnPixelsChangedEvent;
             spriteGridStateService.PropertyChanged += OnGridVisibilityChanged;
             spriteToolbarStateService.PropertyChanged += OnImportedArtChanged;
+            spriteToolbarStateService.PropertyChanged += OnSelectedToolPresetChanged;
             spriteGridStateService.PropertyChanged += OnHoveredPixelChanged;
             canvasDrawingService.ApplyGridSize();
         }
@@ -65,6 +88,13 @@ namespace ConsoleEngine.Editor.ViewModels.Implementations
             return new KeyValuePair<int, Pixel>(index, new Pixel(
                     character, 
                     spriteToolbarStateService.GetSelectedColor()));
+        }
+
+        private void OnSelectedToolPresetChanged(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
+        {
+            if (args.PropertyName != "SelectedToolPreset")
+                return;
+            OnPropertyChanged(nameof(CanvasCursor));
         }
 
         private void OnHoveredPixelChanged(INotifyPropertyChanged sender, IPropertyChangedEventArgs args)
